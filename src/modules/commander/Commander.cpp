@@ -2276,7 +2276,8 @@ void Commander::handleAutoDisarm()
 				_auto_disarm_landed.set_state_and_update(_vehicle_land_detected.landed, hrt_absolute_time());
 
 			} else if (_param_com_disarm_prflt.get() > 0 && !_have_taken_off_since_arming) {
-				_auto_disarm_landed.set_hysteresis_time_from(false, _param_com_disarm_prflt.get() * 1_s);
+				_auto_disarm_landed.set_hysteresis_time_from(false,
+						(_param_com_spoolup_time.get() + _param_com_disarm_prflt.get()) * 1_s);
 				_auto_disarm_landed.set_state_and_update(true, hrt_absolute_time());
 			}
 
@@ -3043,7 +3044,7 @@ The commander module contains the state machine for mode switching and failsafe 
 #ifndef CONSTRAINED_FLASH
 	PRINT_MODULE_USAGE_COMMAND_DESCR("calibrate", "Run sensor calibration");
 	PRINT_MODULE_USAGE_ARG("mag|baro|accel|gyro|level|esc|airspeed", "Calibration type", false);
-	PRINT_MODULE_USAGE_ARG("quick", "Quick calibration (accel only, not recommended)", false);
+	PRINT_MODULE_USAGE_ARG("quick", "Quick calibration [mag, accel (not recommended)]", false);
 	PRINT_MODULE_USAGE_COMMAND_DESCR("check", "Run preflight checks");
 	PRINT_MODULE_USAGE_COMMAND("arm");
 	PRINT_MODULE_USAGE_PARAM_FLAG('f', "Force arming (do not run preflight checks)", true);
