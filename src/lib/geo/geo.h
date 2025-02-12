@@ -75,6 +75,14 @@ struct crosstrack_error_s {
  */
 float get_distance_to_next_waypoint(double lat_now, double lon_now, double lat_next, double lon_next);
 
+
+/**
+ * Returns current heading between 0 and 360 degrees.
+ *
+ *
+ */
+double mapAngleTo360_deg(double angle);
+
 /**
  * Creates a new waypoint C on the line of two given waypoints (A, B) at certain distance
  * from waypoint A
@@ -143,6 +151,26 @@ float get_distance_to_point_global_wgs84(double lat_now, double lon_now, float a
 float mavlink_wpm_distance_to_point_local(float x_now, float y_now, float z_now,
 		float x_next, float y_next, float z_next,
 		float *dist_xy, float *dist_z);
+
+/**
+ * @brief Calculate the line of sight rate to the target.
+ *
+ * @param target_pos Target position vector [m]
+ * @param curr_pos Current position vector [m]
+ * @param target_vel Target velocity vector [m/s]
+ * @param curr_vel Current velocity vector [m/s]
+ */
+matrix::Vector3f calculateLOSRate(const float control_interval, const matrix::Vector3f &target_pos, const matrix::Vector3f &curr_pos,
+				  const matrix::Vector3f &target_vel,  const matrix::Vector3f &curr_vel,float &pitch,float N,bool reset_flag);
+
+
+/**
+ * @brief Calculate the roll and pitch angles for a vehicle to reach a target position
+ */
+void calculateRollAndPitch(float azimuthRate, float elevationRate, float speed, float &roll, float &pitch);
+
+
+
 
 
 /**

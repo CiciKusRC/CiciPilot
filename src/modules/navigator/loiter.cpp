@@ -51,6 +51,8 @@ Loiter::Loiter(Navigator *navigator) :
 void
 Loiter::on_activation()
 {
+	PX4_INFO("Loiter: on_activation");
+	PX4_INFO("Loiter timestamp:%" PRIu64 "\n", hrt_absolute_time());
 	if (_navigator->get_reposition_triplet()->current.valid
 	    && hrt_elapsed_time(&_navigator->get_reposition_triplet()->current.timestamp) < 500_ms) {
 		reposition();

@@ -54,7 +54,7 @@
 #include <uORB/Subscription.hpp>
 #include <uORB/SubscriptionInterval.hpp>
 #include <uORB/Publication.hpp>
-
+#include <lib/mathlib/mathlib.h>
 #include "mission_block.h"
 #include "navigation.h"
 

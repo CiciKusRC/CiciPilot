@@ -135,6 +135,7 @@ MavlinkReceiver::acknowledge(uint8_t sysid, uint8_t compid, uint16_t command, ui
 void
 MavlinkReceiver::handle_message(mavlink_message_t *msg)
 {
+	PX4_INFO("vehicle command id = %d", msg->msgid);
 	switch (msg->msgid) {
 	case MAVLINK_MSG_ID_COMMAND_LONG:
 		handle_message_command_long(msg);
@@ -157,6 +158,7 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 		break;
 
 	case MAVLINK_MSG_ID_SET_MODE:
+		PX4_INFO("Received SET_MODE");
 		handle_message_set_mode(msg);
 		break;
 
@@ -927,6 +929,7 @@ MavlinkReceiver::handle_message_hil_optical_flow(mavlink_message_t *msg)
 void
 MavlinkReceiver::handle_message_set_mode(mavlink_message_t *msg)
 {
+	PX4_INFO("Received SET_MODE HANDLE MESSAGE");
 	mavlink_set_mode_t new_mode;
 	mavlink_msg_set_mode_decode(msg, &new_mode);
 

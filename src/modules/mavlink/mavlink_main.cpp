@@ -2516,8 +2516,7 @@ void Mavlink::handleStatus()
 }
 
 void Mavlink::handleCommands()
-{
-	if (_mode == MAVLINK_MODE_IRIDIUM) {
+{	if (_mode == MAVLINK_MODE_IRIDIUM) {
 		int vehicle_command_updates = 0;
 
 		while (_vehicle_command_sub.updated() && (vehicle_command_updates < vehicle_command_s::ORB_QUEUE_LENGTH)) {

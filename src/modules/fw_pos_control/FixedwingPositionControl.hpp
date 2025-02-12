@@ -98,6 +98,7 @@
 #include <uORB/topics/wind.h>
 #include <uORB/topics/orbit_status.h>
 #include <uORB/uORB.h>
+#include <uORB/topics/kamikaze_pronav_status.h>
 
 #ifdef CONFIG_FIGURE_OF_EIGHT
 #include "figure_eight/FigureEight.hpp"
@@ -228,6 +229,7 @@ private:
 	uORB::Publication<landing_gear_s> _landing_gear_pub {ORB_ID(landing_gear)};
 	uORB::Publication<normalized_unsigned_setpoint_s> _flaps_setpoint_pub{ORB_ID(flaps_setpoint)};
 	uORB::Publication<normalized_unsigned_setpoint_s> _spoilers_setpoint_pub{ORB_ID(spoilers_setpoint)};
+	uORB::Publication<kamikaze_pronav_status_s> _kamikaze_pronav_status_pub{ORB_ID(kamikaze_pronav_status)};
 	uORB::PublicationData<flight_phase_estimation_s> _flight_phase_estimation_pub{ORB_ID(flight_phase_estimation)};
 
 	manual_control_setpoint_s _manual_control_setpoint{};
@@ -236,6 +238,7 @@ private:
 	vehicle_control_mode_s _control_mode{};
 	vehicle_local_position_s _local_pos{};
 	vehicle_status_s _vehicle_status{};
+	kamikaze_pronav_status_s kamikaze_pronav_status{};
 
 	Vector2f _lpos_where_backtrans_started;
 
@@ -258,6 +261,7 @@ private:
 		FW_POSCTRL_MODE_AUTO_LANDING_STRAIGHT,
 		FW_POSCTRL_MODE_AUTO_LANDING_CIRCULAR,
 		FW_POSCTRL_MODE_AUTO_PATH,
+		FW_POSCTRL_MODE_AUTO_KAMIKAZE,
 		FW_POSCTRL_MODE_MANUAL_POSITION,
 		FW_POSCTRL_MODE_MANUAL_ALTITUDE,
 		FW_POSCTRL_MODE_TRANSITION_TO_HOVER_LINE_FOLLOW,
@@ -265,16 +269,64 @@ private:
 		FW_POSCTRL_MODE_OTHER
 	} _control_mode_current{FW_POSCTRL_MODE_OTHER}; // used to check if the mode has changed
 
+	enum KAMIKAZE_PHASE {
+		KKZ_MODE_APPROACHING_TO_LOITER,
+		KKZ_MODE_LOITERING,
+		KKZ_MODE_FLYING_TO_TARGET,
+		KKZ_MODE_DIVING,
+		KKZ_MODE_RECOVERING,
+		KKZ_MODE_RETURN_TO_SAFE_POINT,
+		KKZ_MODE_OTHER
+	}_kamikaze_mode_phase_curr{KKZ_MODE_OTHER};
+
+	enum KKY_NAV_TYPE {
+		KKZ_NAV_TRIANGLE,
+		KKZ_NAV_PRONAV
+	};
+
+
+	 // Kamikaze mode phase transition conditions
+	bool loiter_approach_conditions_met{false};
+	bool loiter_exit_conditions_met{false};
+	bool target_approach_conditions_met{false};
+	bool dive_completion_conditions_met{false};
+	bool recovery_completion_conditions_met{false};
+	bool return_completion_conditions_met{false};
+	bool mission_start_conditions_met{false};
+
+	hrt_abstime loiter_start_time = 0;
+
 	enum StickConfig {
 		STICK_CONFIG_SWAP_STICKS_BIT = (1 << 0),
 		STICK_CONFIG_ENABLE_AIRSPEED_SP_MANUAL_BIT = (1 << 1)
 	};
 
 	// VEHICLE STATES
-
 	double _current_latitude{0};
 	double _current_longitude{0};
 	float _current_altitude{0.f};
+
+
+
+	double _kkz_target_lat{0};
+	double _kkz_target_lon{0};
+
+	float exit_lat{0.f};
+	float exit_lon{0.f};
+
+	float _kkz_dive_alt{0};
+	float _kkz_rec_alt{0.f};
+	float _kkz_rec_g{0.f};
+	float _kkz_approach_ang{0.f};
+	int8_t _kkz_loiter_dir{1};
+	float  _kkz_loiter_rad{0.f};
+	float _kkz_dive_ang{0.f};
+	float _kkz_ret_lat{0.f};
+	float _kkz_ret_lon{0.f};
+	float _heading_range{0.f};
+	float _target_dist_sp{0.f};
+
+	float heading = 0.f;
 
 	float _roll{0.f};
 	float _pitch{0.0f};
@@ -600,6 +652,28 @@ private:
 	void control_auto_descend(const float control_interval);
 
 	/**
+	 * @brief Control position and diving/recovering into a ground target.
+	 *
+	 * behaviour of mission configured by KKZ_* prefixed parameters.
+	 *
+	 * @param control_interval Time since last position control call [s]
+	 */
+
+	void control_auto_kamikaze(const float control_interval, const Vector2d &curr_pos,
+				const Vector2f &ground_speed, const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr,
+				const position_setpoint_s &pos_sp_next);
+
+	/**
+	 * @brief Check that defined kamikaze mission is feasible or not.
+	 *
+	 * TODO: Work with npfg feasibility checker for high winds.
+	 *
+	 * @param control_interval Time since last position control call [s]
+	 */
+
+	void kamikaze_feasiblity_checker(const float control_interval);
+
+	/**
 	 * @brief Vehicle control for position waypoints.
 	 *
 	 * @param control_interval Time since last position control call [s]
@@ -610,6 +684,31 @@ private:
 	 */
 	void control_auto_position(const float control_interval, const Vector2d &curr_pos, const Vector2f &ground_speed,
 				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr);
+
+
+
+	/**
+	 *
+	 * control auto kamikaze diving phase
+	 * @param control_interval Time since last position control call [s]
+	 * @param curr_pos Current 2D local position vector of vehicle [m]
+	 * @param ground_speed Local 2D ground speed of vehicle [m/s]
+	 * @param pos_sp_prev previous position setpoint
+	 * @param pos_sp_curr current position setpoint
+	 * @param dive_angle dive angle for kamikaze
+	 *
+	 */
+	void control_auto_dive(const float control_interval, const Vector2d &curr_pos, const Vector2f &ground_speed,
+				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr,const float &dist_to_qr, const float &pitch_ref);
+
+	/**
+	 *
+	 * control auto kamikaze recovering phase
+	 * @param control_interval Time since last position control call [s]
+	 * @param vehicle_speed Local 3D speed of vehicle [m/s]
+	 * @param reset_flag reset flag for recovery pitch reference
+	 */
+	void control_auto_recovery(const float control_interval, const position_setpoint_s &pos_sp_next);
 
 	/**
 	 * @brief Vehicle control for loiter waypoints.
@@ -807,7 +906,7 @@ private:
 
 	/**
 	 * @brief Calculates the vector from landing approach entrance to touchdown point
-	 *
+	 *a
 	 * NOTE: calculateTouchdownPosition() MUST be called before this method
 	 *
 	 * @return Landing approach vector [m]
@@ -1051,7 +1150,22 @@ private:
 		(ParamFloat<px4::params::FW_TKO_AIRSPD>) _param_fw_tko_airspd,
 
 		(ParamFloat<px4::params::RWTO_PSP>) _param_rwto_psp,
-		(ParamBool<px4::params::FW_LAUN_DETCN_ON>) _param_fw_laun_detcn_on
+		(ParamBool<px4::params::FW_LAUN_DETCN_ON>) _param_fw_laun_detcn_on,
+		(ParamFloat<px4::params::KKZ_QR_LAT>) _param_kkz_qr_lat,
+		(ParamFloat<px4::params::KKZ_QR_LON>) _param_kkz_qr_lon,
+		(ParamFloat<px4::params::KKZ_DIVE_ALT>) _param_kkz_dive_alt,
+		(ParamFloat<px4::params::KKZ_REC_ALT>) _param_kkz_rec_alt,
+		(ParamFloat<px4::params::KKZ_REC_G>) _param_kkz_rec_g,
+		(ParamFloat<px4::params::KKZ_APPROACH_ANG>) _param_kkz_approach_ang,
+		(ParamFloat<px4::params::KKZ_APP_DIST>) _param_kkz_approach_dist,
+		(ParamFloat<px4::params::KKZ_LOITER_RAD>) _param_kkz_loiter_rad,
+		(ParamInt<px4::params::KKZ_LOITER_DIR>) _param_kkz_loiter_dir,
+		(ParamFloat<px4::params::KKZ_DIVE_ANG>) _param_kkz_dive_ang,
+		(ParamFloat<px4::params::KKZ_RET_LAT>) _param_kkz_ret_lat,
+		(ParamFloat<px4::params::KKZ_RET_LON>) _param_kkz_ret_lon,
+		(ParamFloat<px4::params::HEADING_RANGE>) _param_heading_range,
+		(ParamInt<px4::params::KKZ_NAV_TYPE>) _param_kkz_nav_type,
+		(ParamFloat<px4::params::TARGET_DIST_SP>) _param_target_dist_sp
 	)
 
 };

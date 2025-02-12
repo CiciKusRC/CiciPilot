@@ -43,6 +43,10 @@
 #include <lib/geo/geo.h>
 #include <px4_platform_common/defines.h>
 #include <float.h>
+#include <px4_platform_common/px4_config.h>
+#include <px4_platform_common/log.h>
+#include <px4_platform_common/tasks.h>
+#include <px4_platform_common/posix.h>
 
 using matrix::Vector2d;
 using matrix::Vector2f;
@@ -499,6 +503,8 @@ float NPFG::switchDistance(float wp_radius) const
 
 void NPFG::updateRollSetpoint()
 {
+	//PX4_INFO("lateral_accel_ = %f", lateral_accel_);
+	//PX4_INFO("roll_new = %f", atanf(lateral_accel_ * 1.0f / CONSTANTS_ONE_G));
 	float roll_new = atanf(lateral_accel_ * 1.0f / CONSTANTS_ONE_G);
 	roll_new = math::constrain(roll_new, -roll_lim_rad_, roll_lim_rad_);
 

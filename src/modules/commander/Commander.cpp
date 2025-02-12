@@ -369,7 +369,7 @@ int Commander::custom_command(int argc, char *argv[])
 
 			if (!strcmp(argv[1], "manual")) {
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_MANUAL);
-
+				PX4_INFO("switching to manual mode");
 			} else if (!strcmp(argv[1], "altctl")) {
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_ALTCTL);
 
@@ -408,6 +408,10 @@ int Commander::custom_command(int argc, char *argv[])
 			} else if (!strcmp(argv[1], "auto:land")) {
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_AUTO,
 						     PX4_CUSTOM_SUB_MODE_AUTO_LAND);
+
+			} else if (!strcmp(argv[1], "auto:kamikaze")) {
+				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_AUTO,
+						     PX4_CUSTOM_SUB_MODE_AUTO_KAMIKAZE);
 
 			} else if (!strcmp(argv[1], "auto:precland")) {
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_AUTO,
@@ -842,6 +846,10 @@ Commander::handle_command(const vehicle_command_s &cmd)
 
 						case PX4_CUSTOM_SUB_MODE_AUTO_PRECLAND:
 							desired_nav_state = vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND;
+							break;
+
+						case PX4_CUSTOM_SUB_MODE_AUTO_KAMIKAZE:
+							desired_nav_state = vehicle_status_s::NAVIGATION_STATE_AUTO_KAMIKAZE;
 							break;
 
 						case PX4_CUSTOM_SUB_MODE_EXTERNAL1...PX4_CUSTOM_SUB_MODE_EXTERNAL8:

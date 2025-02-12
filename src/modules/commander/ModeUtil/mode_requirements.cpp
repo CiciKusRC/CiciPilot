@@ -158,6 +158,12 @@ void getModeRequirements(uint8_t vehicle_type, failsafe_flags_s &flags)
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND, flags.mode_req_local_alt);
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND, flags.mode_req_prevent_arming);
 
+	// NAVIGATION_STATE_AUTO_KAMIKAZE
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND, flags.mode_req_angular_velocity);
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND, flags.mode_req_attitude);
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_FOLLOW_TARGET, flags.mode_req_local_alt);
+
+
 	// NAVIGATION_STATE_ORBIT
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_ORBIT, flags.mode_req_angular_velocity);
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_ORBIT, flags.mode_req_attitude);

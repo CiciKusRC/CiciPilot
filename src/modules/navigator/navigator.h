@@ -49,6 +49,7 @@
 #include "navigator_mode.h"
 #include "rtl.h"
 #include "takeoff.h"
+#include "kamikaze.h"
 #if CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 #include "vtol_takeoff.h"
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
@@ -95,7 +96,7 @@ using namespace time_literals;
 /**
  * Number of navigation modes that need on_active/on_inactive calls
  */
-#define NAVIGATOR_MODE_ARRAY_SIZE 8
+#define NAVIGATOR_MODE_ARRAY_SIZE 9
 
 class Navigator : public ModuleBase<Navigator>, public ModuleParams
 {
@@ -151,7 +152,10 @@ public:
 	/**
 	 * Setters
 	 */
-	void set_position_setpoint_triplet_updated() { _pos_sp_triplet_updated = true; }
+	void set_position_setpoint_triplet_updated() {
+		 PX4_INFO("_pos_sp_triplet_updated : %d", _pos_sp_triplet_updated);
+		 _pos_sp_triplet_updated = true;
+		 }
 	void set_mission_result_updated() { _mission_result_updated = true; }
 
 	/**
@@ -365,7 +369,8 @@ private:
 #if CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 	VtolTakeoff	_vtol_takeoff;			/**< class for handling VEHICLE_CMD_NAV_VTOL_TAKEOFF command */
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
-	Land		_land;			/**< class for handling land commands */
+	Kamikaze	_kamikaze;			/**< class for handling kamikaze commands */
+	Land		_land;				/**< class for handling land commands */
 	PrecLand	_precland;			/**< class for handling precision land commands */
 	RTL 		_rtl;				/**< class that handles RTL */
 #if CONFIG_NAVIGATOR_ADSB
@@ -386,6 +391,9 @@ private:
 
 	float _cruising_speed_current_mode{-1.0f};
 	float _mission_throttle{NAN};
+
+
+	float kkz_loiter_rad{0.0f};
 
 	bool _is_capturing_images{false}; // keep track if we need to stop capturing images
 
@@ -433,5 +441,6 @@ private:
 		(ParamFloat<px4::params::MIS_YAW_ERR>)        _param_mis_yaw_err,
 		(ParamInt<px4::params::MIS_LND_ABRT_ALT>)     _param_mis_lnd_abrt_alt,
 		(ParamFloat<px4::params::MIS_COMMAND_TOUT>) _param_mis_command_tout
+
 	)
 };

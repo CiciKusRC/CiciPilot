@@ -63,9 +63,11 @@ Takeoff::on_active()
 
 	if (rep->current.valid) {
 		// reset the position
+		PX4_INFO("Takeoff: resetting current position to takeoff position");
 		set_takeoff_position();
 
 	} else if (is_mission_item_reached_or_completed() && !_navigator->get_mission_result()->finished) {
+		PX4_INFO("Takeoff completed");
 		_navigator->get_mission_result()->finished = true;
 		_navigator->set_mission_result_updated();
 		_navigator->mode_completed(getNavigatorStateId());
@@ -75,12 +77,15 @@ Takeoff::on_active()
 		// set loiter item so position controllers stop doing takeoff logic
 		if (_navigator->get_land_detected()->landed) {
 			_mission_item.nav_cmd = NAV_CMD_IDLE;
+			PX4_INFO("Landed after takeoff");
 
 		} else {
 			if (pos_sp_triplet->current.valid) {
+				PX4_INFO("Setting loiter item from current position setpoint");
 				setLoiterItemFromCurrentPositionSetpoint(&_mission_item);
 
 			} else {
+				PX4_INFO("Setting loiter item from current position");
 				setLoiterItemFromCurrentPosition(&_mission_item);
 			}
 		}
@@ -121,6 +126,8 @@ Takeoff::set_takeoff_position()
 
 	// set current mission item to takeoff
 	set_takeoff_item(&_mission_item, takeoff_altitude_amsl);
+	PX4_INFO("Setting takeoff position to: lat %.7f, lon %.7f, alt %.2f",
+		 (double)_mission_item.lat, (double)_mission_item.lon, (double)_mission_item.altitude);
 	_navigator->get_mission_result()->finished = false;
 	_navigator->set_mission_result_updated();
 	reset_mission_item_reached();
@@ -133,7 +140,7 @@ Takeoff::set_takeoff_position()
 	pos_sp_triplet->next.valid = false;
 
 	if (rep->current.valid) {
-
+		PX4_INFO(rep->current.valid ? "Debug Using takeoff position from triplet" : "Debug Using takeoff position from current position");
 		// Go on and check which changes had been requested
 		if (PX4_ISFINITE(rep->current.yaw)) {
 			pos_sp_triplet->current.yaw = rep->current.yaw;

@@ -146,6 +146,7 @@ void LoggedTopics::add_default_topics()
 	add_topic("vehicle_status");
 	add_optional_topic("vtol_vehicle_status", 200);
 	add_topic("wind", 1000);
+	add_topic("kamikaze_pronav_status", 100);
 
 	// multi topics
 	add_optional_topic_multi("actuator_outputs", 100, 3);

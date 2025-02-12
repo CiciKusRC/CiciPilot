@@ -43,9 +43,8 @@
  */
 
 #include "geo.h"
-
 #include <float.h>
-
+#include <px4_platform_common/events.h>
 using matrix::wrap_pi;
 using matrix::wrap_2pi;
 
@@ -400,3 +399,68 @@ float mavlink_wpm_distance_to_point_local(float x_now, float y_now, float z_now,
 
 	return sqrtf(dx * dx + dy * dy + dz * dz);
 }
+
+double mapAngleTo360_deg(double angle) {
+    // -180 ile 180 aralığını 0 ile 360 arasına dönüştür
+    angle*=M_RAD_TO_DEG_F;
+    if (angle < 0) {
+        return 360 + angle;
+    }
+    return angle;
+}
+
+matrix::Vector3f calculateLOSRate(const float control_interval, const matrix::Vector3f &target_pos, const matrix::Vector3f &curr_pos,
+	const matrix::Vector3f &target_vel, const matrix::Vector3f &curr_vel, float &_pitch, float N, bool reset_flag) {
+	static float _pitch_ref = 0.0f;  // İlk çağrıda sıfır başlatılır
+	if (_pitch_ref == 0.0f) {  // İlk çağrıda _pitch ile başlat
+	_pitch_ref = _pitch;
+	}
+	if(reset_flag){
+	_pitch_ref = 0.0f;
+	return matrix::Vector3f();
+	}
+
+	float vehicle_speed = sqrtf(curr_vel(0) * curr_vel(0) + curr_vel(1) * curr_vel(1) + curr_vel(2) * curr_vel(2));
+	float relPosX = target_pos(0) - curr_pos(0);
+	float relPosY = target_pos(1) - curr_pos(1);
+	float planarDistance = sqrtf(relPosX * relPosX + relPosY * relPosY);
+
+	float relPosZ = target_pos(2) - curr_pos(2);
+	float relDistance = sqrtf(planarDistance * planarDistance + relPosZ * relPosZ);
+	float relVelX = target_vel(0) - sqrt(curr_vel(0)*curr_vel(0) + curr_vel(1)*curr_vel(1));
+	float relVelY = target_vel(2) - curr_vel(2);
+
+	float closingVelocity = -(planarDistance * relVelX + relPosZ * relVelY) / relDistance;
+	float finalFlightPathRad = -75.0f * M_DEG_TO_RAD_F;
+	float maxAccelG = 3 * CONSTANTS_ONE_G;
+	float LOS_Angle = atan2(relPosZ, planarDistance);
+	float losRate = (planarDistance * relVelY - relPosZ * relVelX) / (relDistance * relDistance);
+	float TGO = relDistance / closingVelocity;
+	//float accelCmd = N * closingVelocity * losRate + 2.0 * closingVelocity * (LOS_Angle - finalFlightPathRad) / TGO;
+	float accelCmd = N * vehicle_speed * losRate;
+	accelCmd = math::constrain(accelCmd, -maxAccelG, maxAccelG);
+	float accelCmd_X = -accelCmd * sin(LOS_Angle);
+	float accelCmd_Y = accelCmd * cos(LOS_Angle);
+	float desiredPitchRate = accelCmd / vehicle_speed;
+
+	// Pitch referansını arttır
+	_pitch_ref -= desiredPitchRate * control_interval;
+
+	float pitchSp = _pitch_ref;
+
+	return matrix::Vector3f(closingVelocity, desiredPitchRate, pitchSp * M_RAD_TO_DEG_F);
+}
+
+void calculateRollAndPitch(float azimuthRate, float elevationRate, float speed, float &roll, float &pitch) {
+ const float N = 4.0f;   // Navigasyon sabiti (3-5 arası tipik)
+    const float g = 9.81f;  // Yerçekimi ivmesi (m/s²)
+
+    // Azimuth ve Elevation yönlerinde ivme hesapla
+    float acceleration_azimuth = N * speed * azimuthRate;
+    float acceleration_elevation = N * speed * elevationRate;
+
+    // İvmeyi açıya dönüştür (a = g * tan(θ) → θ = arctan(a/g))
+    roll =  std::atan(acceleration_azimuth * 1.0f / CONSTANTS_ONE_G);
+    pitch = std::atan(acceleration_elevation = N * speed * elevationRate);
+}
+
