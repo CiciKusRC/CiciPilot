@@ -51,6 +51,9 @@
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/kamikaze_visualize.h>
+#include <uORB/Publication.hpp>
+
 using namespace time_literals;
 
 class Kamikaze : public	MissionBlock , public ModuleParams
@@ -124,4 +127,6 @@ private:
 	void parameters_update();
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
+
+	uORB::Publication<kamikaze_visualize_s> _kamikaze_visualize_pub{ORB_ID(kamikaze_visualize)};
 };

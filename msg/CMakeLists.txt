@@ -118,6 +118,7 @@ set(msg_files
 	IridiumsbdStatus.msg
 	IrlockReport.msg
 	KamikazePronavStatus.msg
+	KamikazeVisualize.msg
 	LandingGear.msg
 	LandingGearWheel.msg
 	LandingTargetInnovations.msg

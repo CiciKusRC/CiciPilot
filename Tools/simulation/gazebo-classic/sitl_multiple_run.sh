@@ -78,7 +78,7 @@ do
 	esac
 done
 
-num_vehicles=${NUM_VEHICLES:=3}
+num_vehicles=${NUM_VEHICLES:=1}
 world=${WORLD:=empty}
 target=${TARGET:=px4_sitl_default}
 vehicle_model=${VEHICLE_MODEL:="iris"}

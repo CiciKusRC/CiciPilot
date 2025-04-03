@@ -2,6 +2,7 @@
 #include <mathlib/mathlib.h>
 #include "navigator.h"
 
+
 using matrix::Vector2f;
 using matrix::Vector2d;
 using matrix::Vector3f;
@@ -73,6 +74,15 @@ void Kamikaze::calculate_loiter_position()
 	pos_sp_triplet->next.alt = kkz_dive_alt+_navigator->get_home_position()->alt;
 	pos_sp_triplet->next.type = position_setpoint_s::SETPOINT_TYPE_POSITION;
 	_navigator->set_position_setpoint_triplet_updated();
+
+	kamikaze_visualize_s kkz_visualize{};
+	kkz_visualize.timestamp = hrt_absolute_time();
+	kkz_visualize.loiter_lat = loiter_lat * M_RAD_TO_DEG_F;
+	kkz_visualize.loiter_lon = loiter_lon * M_RAD_TO_DEG_F;
+	kkz_visualize.exit_lat = exit_lat * M_RAD_TO_DEG_F;
+	kkz_visualize.exit_lon = exit_lon * M_RAD_TO_DEG_F;
+	_kamikaze_visualize_pub.publish(kkz_visualize);
+
 
 }
 
