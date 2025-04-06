@@ -444,7 +444,7 @@ matrix::Vector3f calculateLOSRate(const float control_interval, const matrix::Ve
 	float desiredPitchRate = accelCmd / vehicle_speed;
 
 	// Pitch referansını arttır
-	_pitch_ref -= desiredPitchRate * control_interval;
+	_pitch_ref += desiredPitchRate * control_interval;
 
 	float pitchSp = _pitch_ref;
 
