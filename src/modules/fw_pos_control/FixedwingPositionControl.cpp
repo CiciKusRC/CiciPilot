@@ -1291,13 +1291,16 @@ FixedwingPositionControl::control_auto_dive(const float control_interval, const 
 				   _param_climbrate_target.get(),
 				   is_low_height);
 
+	float pitch_body = 0.0f;
 	if(_param_kkz_nav_type.get() == KKZ_NAV_PRONAV){
-		const float pitch_body = pitch_ref*M_DEG_TO_RAD;
+		pitch_body = pitch_ref*M_DEG_TO_RAD;
 	}
 	else{
-		const float pitch_body = -((M_PI_2_F)-atan(dist_to_qr/-_local_pos.z));
+		pitch_body = (-((M_PI_2_F)-atan(dist_to_qr/-_local_pos.z)));
 	}
-	const float pitch_body = pitch_ref*M_DEG_TO_RAD;
+	//const float pitch_body = -((M_PI_2_F)-atan(dist_to_qr/-_local_pos.z));
+	//const float pitch_body = pitch_ref*M_DEG_TO_RAD;
+	PX4_INFO("Pitch body:%f",pitch_body);
 	const Quatf attitude_setpoint(Eulerf(roll_body, pitch_body, yaw_body));
 	attitude_setpoint.copyTo(_att_sp.q_d);
 

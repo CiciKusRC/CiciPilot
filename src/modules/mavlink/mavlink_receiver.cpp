@@ -135,7 +135,7 @@ MavlinkReceiver::acknowledge(uint8_t sysid, uint8_t compid, uint16_t command, ui
 void
 MavlinkReceiver::handle_message(mavlink_message_t *msg)
 {
-	PX4_INFO("vehicle command id = %d", msg->msgid);
+	//PX4_INFO("vehicle command id = %d", msg->msgid);
 	switch (msg->msgid) {
 	case MAVLINK_MSG_ID_COMMAND_LONG:
 		handle_message_command_long(msg);
@@ -288,6 +288,10 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 
 	case MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM:
 		handle_message_open_drone_id_system(msg);
+		break;
+
+	case MAVLINK_MSG_ID_TARGET_LOCATION_XY:
+		handle_message_target_location(msg);
 		break;
 
 #if !defined(CONSTRAINED_FLASH)
@@ -2857,6 +2861,20 @@ MavlinkReceiver::handle_message_debug_vect(mavlink_message_t *msg)
 	debug_topic.z = debug_msg.z;
 
 	_debug_vect_pub.publish(debug_topic);
+}
+
+void
+MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg)
+{
+	mavlink_target_location_xy_t target_location_msg;
+	mavlink_msg_target_location_xy_decode(msg, &target_location_msg);
+
+	target_location_s target_location_topic{};
+
+	target_location_topic.timestamp = hrt_absolute_time();
+	target_location_topic.target_x = target_location_msg.target_x;
+	target_location_topic.target_y = target_location_msg.target_y;
+	_target_location_pub.publish(target_location_topic);
 }
 
 void
