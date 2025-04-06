@@ -781,8 +781,6 @@ FixedwingPositionControl::set_control_mode_current(const hrt_abstime &now)
 			_control_mode_current = FW_POSCTRL_MODE_AUTO;
 		}
 
-	PX4_INFO("VALID SETPOINT MISSION ENABLE:%" PRIu64 "\n", hrt_absolute_time());
-
 	}
 
 	else if (_control_mode.flag_control_auto_enabled

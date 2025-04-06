@@ -81,7 +81,7 @@ done
 num_vehicles=${NUM_VEHICLES:=1}
 world=${WORLD:=empty}
 target=${TARGET:=px4_sitl_default}
-vehicle_model=${VEHICLE_MODEL:="iris"}
+vehicle_model=${VEHICLE_MODEL:="plane"}
 export PX4_SIM_MODEL=gazebo-classic_${vehicle_model}
 
 echo ${SCRIPT}
