@@ -295,6 +295,7 @@ void CrsfRc::Run()
 					case vehicle_status_s::NAVIGATION_STATE_AUTO_FOLLOW_TARGET:
 					case vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND:
 					case vehicle_status_s::NAVIGATION_STATE_AUTO_KAMIKAZE:
+					case vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT:
 						flight_mode = "Auto";
 						break;
 

@@ -18,6 +18,7 @@ bool flag_control_rates_enabled			# true if rates are stabilized
 bool flag_control_allocation_enabled		# true if control allocation is enabled
 bool flag_control_termination_enabled		# true if flighttermination is enabled
 bool flag_control_kamikaze_enable		# true if kamikaze proccess initiated
+bool flag_control_intercept_enable		# true if intercept process initiated
 
 # TODO: use dedicated topic for external requests
 uint8 source_id                  # Mode ID (nav_state)
