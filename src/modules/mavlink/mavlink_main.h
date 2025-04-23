@@ -654,6 +654,7 @@ private:
 
 	DEFINE_PARAMETERS(
 		(ParamInt<px4::params::MAV_SYS_ID>) _param_mav_sys_id,
+		(ParamInt<px4::params::ZONE_ID>) _zone_id,
 		(ParamInt<px4::params::MAV_COMP_ID>) _param_mav_comp_id,
 		(ParamInt<px4::params::MAV_PROTO_VER>) _param_mav_proto_ver,
 		(ParamInt<px4::params::MAV_SIK_RADIO_ID>) _param_sik_radio_id,

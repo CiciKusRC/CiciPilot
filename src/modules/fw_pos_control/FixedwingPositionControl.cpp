@@ -701,7 +701,6 @@ FixedwingPositionControl::set_control_mode_current(const hrt_abstime &now)
 	if (_control_mode_current != FW_POSCTRL_MODE_AUTO_KAMIKAZE && _control_mode.flag_control_kamikaze_enable) {
 		_kamikaze_mode_phase_curr = KKZ_MODE_OTHER;
 		loiter_start_time = hrt_absolute_time();
-		PX4_INFO("First Start time:%" PRIu64 "\n", loiter_start_time);
 	}
 	/* only run position controller in fixed-wing mode and during transitions for VTOL */
 	if (_vehicle_status.vehicle_type == vehicle_status_s::VEHICLE_TYPE_ROTARY_WING && !_vehicle_status.in_transition_mode) {
@@ -713,8 +712,6 @@ FixedwingPositionControl::set_control_mode_current(const hrt_abstime &now)
 
 	_skipping_takeoff_detection = false;
 	const bool doing_backtransition = _vehicle_status.in_transition_mode && !_vehicle_status.in_transition_to_fw;
-	//PX4_INFO("BURADA");
-	//PX4_INFO("CONTROL kamikaze mode flag :%d",_control_mode.flag_control_kamikaze_enable);
 	if (_control_mode.flag_control_offboard_enabled && _position_setpoint_current_valid
 	    && _control_mode.flag_control_position_enabled) {
 		if (PX4_ISFINITE(_pos_sp_triplet.current.vx) && PX4_ISFINITE(_pos_sp_triplet.current.vy)
@@ -728,13 +725,19 @@ FixedwingPositionControl::set_control_mode_current(const hrt_abstime &now)
 			_control_mode_current = FW_POSCTRL_MODE_AUTO;
 			return;
 		}
-
-	PX4_INFO("OFFBOARD ENABLE");
-
 	}
 	else if(_control_mode.flag_control_kamikaze_enable){
-		//PX4_INFO("CONTROL KAMIKAZE ENABLE");
 		_control_mode_current = FW_POSCTRL_MODE_AUTO_KAMIKAZE;
+	}
+
+	else if(_control_mode.flag_control_intercept_enable){
+		if (_param_fw_vis_nav_en.get())
+		{
+			PX4_INFO("PARAMETER: %d", _param_fw_vis_nav_en.get());
+			_control_mode_current = FW_POSCTRL_MODE_OTHER;
+		}
+
+		_control_mode_current = FW_POSCTRL_MODE_AUTO_GEO_INTERCEPT;
 	}
 	else if ((_control_mode.flag_control_auto_enabled && _control_mode.flag_control_position_enabled)
 		   && (_position_setpoint_current_valid
@@ -818,7 +821,6 @@ FixedwingPositionControl::set_control_mode_current(const hrt_abstime &now)
 			_control_mode_current = FW_POSCTRL_MODE_AUTO_CLIMBRATE;
 		}
 
-	PX4_INFO("GALIBA GPS FAIL");
 	} else if (_control_mode.flag_control_manual_enabled && _control_mode.flag_control_position_enabled) {
 		if (commanded_position_control_mode != FW_POSCTRL_MODE_MANUAL_POSITION) {
 			/* Need to init because last loop iteration was in a different mode */
@@ -981,6 +983,7 @@ FixedwingPositionControl::control_auto(const float control_interval, const Vecto
 void
 FixedwingPositionControl::control_auto_fixed_bank_alt_hold(const float control_interval)
 {
+	PX4_INFO("control_auto_fixed_bank_alt_hold");
 	const bool is_low_height = checkLowHeightConditions();
 
 	// only control altitude and airspeed ("fixed-bank loiter")
@@ -1298,7 +1301,6 @@ FixedwingPositionControl::control_auto_dive(const float control_interval, const 
 	}
 	//const float pitch_body = -((M_PI_2_F)-atan(dist_to_qr/-_local_pos.z));
 	//const float pitch_body = pitch_ref*M_DEG_TO_RAD;
-	PX4_INFO("Pitch body:%f",pitch_body);
 	const Quatf attitude_setpoint(Eulerf(roll_body, pitch_body, yaw_body));
 	attitude_setpoint.copyTo(_att_sp.q_d);
 
@@ -1398,6 +1400,62 @@ FixedwingPositionControl::control_auto_position(const float control_interval, co
 	attitude_setpoint.copyTo(_att_sp.q_d);
 }
 
+
+void
+FixedwingPositionControl::control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos,
+		const Vector2f &ground_speed, const position_setpoint_s &pos_sp_curr)
+{
+
+	if (_target_location_lla_sub.updated()) {
+		// Check if target_location_lla message is updated
+		if (_target_location_lla_sub.copy(&target_location_lla_msg)) {
+		}
+	}
+
+
+
+	float tecs_fw_thr_min = _param_fw_thr_min.get();
+	float tecs_fw_thr_max = _param_fw_thr_max.get();
+
+
+
+	float position_sp_alt = target_location_lla_msg.target_alt;//float(_local_pos.ref_alt) + 50.0f;//
+
+	Vector2f curr_pos_local{_local_pos.x, _local_pos.y};
+	Vector2f curr_wp_local = _global_local_proj_ref.project(target_location_lla_msg.target_lat,
+			target_location_lla_msg.target_lon);
+
+
+
+	float target_airspeed = adapt_airspeed_setpoint(control_interval, pos_sp_curr.cruising_speed,
+				_performance_model.getMinimumCalibratedAirspeed(getLoadFactor()), ground_speed);
+
+	_npfg.setAirspeedNom(target_airspeed * _eas2tas);
+	_npfg.setAirspeedMax(_performance_model.getMaximumCalibratedAirspeed() * _eas2tas);
+
+	navigateWaypoint(curr_wp_local, curr_pos_local, ground_speed, _wind_vel);
+	float roll_body = getCorrectedNpfgRollSetpoint();
+	target_airspeed = _npfg.getAirspeedRef() / _eas2tas;
+
+	float yaw_body = _yaw; // yaw is not controlled, so set setpoint to current yaw
+
+	const bool is_low_height = checkLowHeightConditions();
+
+	tecs_update_pitch_throttle(control_interval,
+				   position_sp_alt,
+				   target_airspeed,
+				   radians(_param_fw_p_lim_min.get()),
+				   radians(_param_fw_p_lim_max.get()),
+				   tecs_fw_thr_min,
+				   tecs_fw_thr_max,
+				   _param_sinkrate_target.get(),
+				   _param_climbrate_target.get(),
+				   is_low_height);
+
+	const float pitch_body = get_tecs_pitch();
+	const Quatf attitude_setpoint(Eulerf(roll_body, pitch_body, yaw_body));
+	attitude_setpoint.copyTo(_att_sp.q_d);
+}
 
 void
 FixedwingPositionControl::control_auto_velocity(const float control_interval, const Vector2d &curr_pos,
@@ -2909,8 +2967,14 @@ FixedwingPositionControl::Run()
 				break;
 			}
 
+
 		case FW_POSCTRL_MODE_AUTO_KAMIKAZE: {
 				control_auto_kamikaze(control_interval,curr_pos,ground_speed,_pos_sp_triplet.previous,_pos_sp_triplet.current,_pos_sp_triplet.next);
+				break;
+			}
+
+		case FW_POSCTRL_MODE_AUTO_GEO_INTERCEPT: {
+				control_auto_geo_intercept(control_interval, curr_pos, ground_speed, _pos_sp_triplet.current);
 				break;
 			}
 
@@ -2956,6 +3020,7 @@ FixedwingPositionControl::Run()
 			}
 
 		case FW_POSCTRL_MODE_OTHER: {
+				//PX4_INFO("FW_POSCTRL_MODE_OTHER");
 				_att_sp.thrust_body[0] = min(_att_sp.thrust_body[0], _param_fw_thr_max.get());
 				break;
 			}

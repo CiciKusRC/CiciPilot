@@ -99,6 +99,7 @@
 #include <uORB/topics/orbit_status.h>
 #include <uORB/uORB.h>
 #include <uORB/topics/kamikaze_pronav_status.h>
+#include <uORB/topics/target_location_lla.h>
 
 #ifdef CONFIG_FIGURE_OF_EIGHT
 #include "figure_eight/FigureEight.hpp"
@@ -217,6 +218,7 @@ private:
 	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+	uORB::Subscription _target_location_lla_sub{ORB_ID(target_location_lla)};
 
 	uORB::Publication<vehicle_attitude_setpoint_s> _attitude_sp_pub;
 	uORB::Publication<vehicle_local_position_setpoint_s> _local_pos_sp_pub{ORB_ID(vehicle_local_position_setpoint)};
@@ -232,6 +234,8 @@ private:
 	uORB::Publication<kamikaze_pronav_status_s> _kamikaze_pronav_status_pub{ORB_ID(kamikaze_pronav_status)};
 	uORB::PublicationData<flight_phase_estimation_s> _flight_phase_estimation_pub{ORB_ID(flight_phase_estimation)};
 
+
+
 	manual_control_setpoint_s _manual_control_setpoint{};
 	position_setpoint_triplet_s _pos_sp_triplet{};
 	vehicle_attitude_setpoint_s _att_sp{};
@@ -239,7 +243,7 @@ private:
 	vehicle_local_position_s _local_pos{};
 	vehicle_status_s _vehicle_status{};
 	kamikaze_pronav_status_s kamikaze_pronav_status{};
-
+	target_location_lla_s target_location_lla_msg{};
 	Vector2f _lpos_where_backtrans_started;
 
 	bool _position_setpoint_previous_valid{false};
@@ -262,6 +266,7 @@ private:
 		FW_POSCTRL_MODE_AUTO_LANDING_CIRCULAR,
 		FW_POSCTRL_MODE_AUTO_PATH,
 		FW_POSCTRL_MODE_AUTO_KAMIKAZE,
+		FW_POSCTRL_MODE_AUTO_GEO_INTERCEPT,
 		FW_POSCTRL_MODE_MANUAL_POSITION,
 		FW_POSCTRL_MODE_MANUAL_ALTITUDE,
 		FW_POSCTRL_MODE_TRANSITION_TO_HOVER_LINE_FOLLOW,
@@ -686,6 +691,18 @@ private:
 				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr);
 
 
+
+
+	/**
+	 * @brief Vehicle control for heading hold waypoints.
+	 *
+	 * @param control_interval Time since last position control call [s]
+	 * @param curr_pos Current 2D local position vector of vehicle [m]
+	 * @param ground_speed Local 2D ground speed of vehicle [m/s]
+	 * @param pos_sp_curr current position setpoint
+	 */
+	void control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos,
+		const Vector2f &ground_speed, const position_setpoint_s &pos_sp_curr);
 
 	/**
 	 *
@@ -1137,6 +1154,7 @@ private:
 
 		(ParamFloat<px4::params::RWTO_NPFG_PERIOD>) _param_rwto_npfg_period,
 		(ParamBool<px4::params::RWTO_NUDGE>) _param_rwto_nudge,
+		(ParamBool<px4::params::FW_VIS_NAV_EN>) _param_fw_vis_nav_en,
 
 		(ParamFloat<px4::params::FW_LND_FL_TIME>) _param_fw_lnd_fl_time,
 		(ParamFloat<px4::params::FW_LND_FL_SINK>) _param_fw_lnd_fl_sink,

@@ -254,3 +254,51 @@ PARAM_DEFINE_FLOAT(FW_MAN_R_MAX, 45.0f);
  * @group FW Attitude Control
  */
 PARAM_DEFINE_FLOAT(FW_MAN_P_MAX, 30.0f);
+
+
+
+/**
+ * Roll scale factor for vision based navigation
+ *
+ * This parameter defines the roll scale factor for vision-based navigation.
+ * It should be a value between 0 and 1.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 1.0
+ * @decimal 4
+ * @increment 0.0001
+ * @group FW Attitude Control
+ *
+ */
+PARAM_DEFINE_FLOAT(FW_ROLL_SCALE,0.0417f);
+
+
+/**
+ * Pitch scale factor for vision based navigation
+ *
+ * This parameter defines the pitch scale factor for vision-based navigation.
+ * It should be a value between 0 and 1.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 1.0
+ * @decimal 4
+ * @increment 0.0001
+ * @group FW Attitude Control
+ *
+ */
+PARAM_DEFINE_FLOAT(FW_PITCH_SCALE,0.0417f);
+
+
+
+/**
+ * Enable vision based navigation
+ *
+ * This parameter enables or disables the vision-based navigation.
+ * 0: disabled, 1: enabled
+ *
+ * @boolean
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_INT32(FW_VIS_NAV_EN, 0);

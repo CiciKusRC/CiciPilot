@@ -31,6 +31,16 @@
  *
  ****************************************************************************/
 
+
+/**
+ *
+ * ZONE_ID
+ * @group MAVLink
+ * @min 1
+ * @max 5
+ */
+PARAM_DEFINE_INT32(ZONE_ID, 1);
+
 /**
  * MAVLink system ID
  * @group MAVLink

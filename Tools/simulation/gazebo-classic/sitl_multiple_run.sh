@@ -150,4 +150,5 @@ fi
 trap "cleanup" SIGINT SIGTERM EXIT
 
 echo "Starting gazebo client"
-gzclient
+#gzclient
+wait

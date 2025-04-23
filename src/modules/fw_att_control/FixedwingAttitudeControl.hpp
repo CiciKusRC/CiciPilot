@@ -41,6 +41,7 @@
 #include <lib/mathlib/mathlib.h>
 #include <lib/parameters/param.h>
 #include <lib/perf/perf_counter.h>
+#include <lib/slew_rate/SlewRate.hpp>
 #include <matrix/math.hpp>
 #include <px4_platform_common/px4_config.h>
 #include <px4_platform_common/defines.h>
@@ -65,14 +66,16 @@
 #include <uORB/topics/vehicle_land_detected.h>
 #include <uORB/topics/vehicle_rates_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
-
+#include <uORB/topics/target_location.h>
+#include <uORB/topics/visual_location.h>
 using matrix::Eulerf;
 using matrix::Quatf;
 
 using uORB::SubscriptionData;
 
 using namespace time_literals;
-
+#define CENTER_X 640
+#define CENTER_Y 360
 class FixedwingAttitudeControl final : public ModuleBase<FixedwingAttitudeControl>, public ModuleParams,
 	public px4::ScheduledWorkItem
 {
@@ -94,6 +97,11 @@ public:
 private:
 	void Run() override;
 
+	float target_x{0.f};
+	float target_y{0.f};
+	float x_err_center{0.f};
+	float y_err_center{0.f};
+	hrt_abstime _last_time_att_control_called{0};
 	uORB::SubscriptionCallbackWorkItem _att_sub{this, ORB_ID(vehicle_attitude)};		/**< vehicle attitude */
 
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
@@ -106,12 +114,13 @@ private:
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};		/**< vehicle land detected subscription */
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};				/**< vehicle status subscription */
 	uORB::Subscription _vehicle_rates_sub{ORB_ID(vehicle_angular_velocity)};
-
+	uORB::Subscription _target_location_sub{ORB_ID(target_location)};			/**< target location subscription */
 	uORB::SubscriptionData<airspeed_validated_s> _airspeed_validated_sub{ORB_ID(airspeed_validated)};
 
 	uORB::Publication<vehicle_attitude_setpoint_s>	_attitude_sp_pub;
 	uORB::Publication<vehicle_rates_setpoint_s>	_rate_sp_pub{ORB_ID(vehicle_rates_setpoint)};
 	uORB::Publication<landing_gear_wheel_s>		_landing_gear_wheel_pub{ORB_ID(landing_gear_wheel)};
+	uORB::Publication<visual_location_s>	_visual_location_pub{ORB_ID(visual_location)};
 
 	manual_control_setpoint_s		_manual_control_setpoint{};
 	vehicle_attitude_setpoint_s		_att_sp{};
@@ -119,7 +128,8 @@ private:
 	vehicle_rates_setpoint_s		_rates_sp{};
 	vehicle_status_s			_vehicle_status{};
 	landing_gear_wheel_s			_landing_gear_wheel{};
-
+	target_location_s			_target_location{};
+	visual_location_s			_visual_location{};
 	matrix::Dcmf _R{matrix::eye<float, 3>()};
 
 	perf_counter_t _loop_perf;
@@ -140,14 +150,17 @@ private:
 		(ParamFloat<px4::params::FW_MAN_P_MAX>) _param_fw_man_p_max,
 		(ParamFloat<px4::params::FW_MAN_R_MAX>) _param_fw_man_r_max,
 
+		(ParamFloat<px4::params::FW_ROLL_SCALE>) _param_fw_roll_scale,
+		(ParamFloat<px4::params::FW_PITCH_SCALE>) _param_fw_pitch_scale,
+
 		(ParamFloat<px4::params::FW_P_RMAX_NEG>) _param_fw_p_rmax_neg,
 		(ParamFloat<px4::params::FW_P_RMAX_POS>) _param_fw_p_rmax_pos,
 		(ParamFloat<px4::params::FW_P_TC>) _param_fw_p_tc,
 		(ParamFloat<px4::params::FW_PSP_OFF>) _param_fw_psp_off,
-
+		(ParamFloat<px4::params::FW_PN_R_SLEW_MAX>) _param_fw_pn_r_slew_max,
 		(ParamFloat<px4::params::FW_R_RMAX>) _param_fw_r_rmax,
 		(ParamFloat<px4::params::FW_R_TC>) _param_fw_r_tc,
-
+		(ParamBool<px4::params::FW_VIS_NAV_EN>) _param_fw_vis_nav_en,
 		(ParamBool<px4::params::FW_W_EN>) _param_fw_w_en,
 		(ParamFloat<px4::params::FW_W_RMAX>) _param_fw_w_rmax,
 		(ParamFloat<px4::params::FW_WR_FF>) _param_fw_wr_ff,
@@ -159,14 +172,18 @@ private:
 		(ParamFloat<px4::params::FW_MAN_YR_MAX>) _param_man_yr_max
 
 	)
-
+	static constexpr float MIN_AUTO_TIMESTEP = 0.01f;
+	// [s] maximum time step between auto control updates
+	static constexpr float MAX_AUTO_TIMESTEP = 0.05f;
 	RollController _roll_ctrl;
 	PitchController _pitch_ctrl;
 	YawController _yaw_ctrl;
 	WheelController _wheel_ctrl;
-
+	SlewRate<float> _roll_vis_slew_rate;
+	SlewRate<float> _pitch_vis_slew_rate;
 	void parameters_update();
 	void vehicle_manual_poll(const float yaw_body);
+	void vision_based_nav(const float yaw_body,const float control_interval);
 	void vehicle_attitude_setpoint_poll();
 	void vehicle_land_detected_poll();
 	float get_airspeed_constrained();

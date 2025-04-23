@@ -24,12 +24,13 @@ void Kamikaze::on_activation()
 	kkz_dive_alt = _param_kkz_dive_alt.get();
 	//_local_pos = _navigator->get_local_position();
 	calculate_loiter_position();
-	PX4_INFO("Kamikaze mission activated");
+	PX4_INFO("Kamikaze mission on activation");
 
 }
 
 void Kamikaze::on_active()
 {
+	PX4_INFO("Kamikaze mission on active");
 	parameters_update();
 }
 

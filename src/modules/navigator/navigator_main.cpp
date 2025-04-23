@@ -76,6 +76,7 @@ Navigator::Navigator() :
 	_loiter(this),
 	_takeoff(this),
 	_kamikaze(this),
+	_intercept(this),
 #if CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 	_vtol_takeoff(this),
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
@@ -94,6 +95,7 @@ Navigator::Navigator() :
 	_navigation_mode_array[6] = &_vtol_takeoff;
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 	_navigation_mode_array[7] = &_kamikaze;
+	_navigation_mode_array[8] = &_intercept;
 
 	/* iterate through navigation modes and initialize _mission_item for each */
 	for (unsigned int i = 0; i < NAVIGATOR_MODE_ARRAY_SIZE; i++) {
@@ -812,6 +814,11 @@ void Navigator::run()
 		case vehicle_status_s::NAVIGATION_STATE_AUTO_KAMIKAZE:
 			_pos_sp_triplet_published_invalid_once = false;
 			navigation_mode_new = &_kamikaze;
+			break;
+
+		case vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT:
+			_pos_sp_triplet_published_invalid_once = false;
+			navigation_mode_new = &_intercept;
 			break;
 
 		case vehicle_status_s::NAVIGATION_STATE_AUTO_LAND:

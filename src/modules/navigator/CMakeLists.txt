@@ -48,6 +48,7 @@ set(NAVIGATOR_SOURCES
 	rtl_mission_fast_reverse.cpp
 	takeoff.cpp
 	kamikaze.cpp
+	intercept.cpp
 	land.cpp
 	precland.cpp
 	mission_feasibility_checker.cpp

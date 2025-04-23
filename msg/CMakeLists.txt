@@ -208,6 +208,7 @@ set(msg_files
 	SystemPower.msg
 	TakeoffStatus.msg
 	TargetLocation.msg
+	TargetLocationLla.msg
 	TaskStackInfo.msg
 	TecsStatus.msg
 	TelemetryStatus.msg
@@ -237,6 +238,7 @@ set(msg_files
 	VehicleTrajectoryBezier.msg
 	VehicleTrajectoryWaypoint.msg
 	VelocityLimits.msg
+	VisualLocation.msg
 	WheelEncoders.msg
 	Wind.msg
 	YawEstimatorStatus.msg

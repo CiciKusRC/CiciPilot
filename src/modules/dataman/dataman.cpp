@@ -149,9 +149,34 @@ static uint8_t dataman_clients_count = 1;
 static perf_counter_t _dm_read_perf{nullptr};
 static perf_counter_t _dm_write_perf{nullptr};
 
+
+static param_t param_zone_id{PARAM_INVALID};
+static int32_t zone_id{1}; // Default value
+
+// Move the initialization to a function, for example in task_main or in a new init function
+static void initialize_parameters()
+{
+    param_zone_id = param_find("ZONE_ID");
+    if (param_zone_id != PARAM_INVALID) {
+        param_get(param_zone_id, &zone_id);
+    }
+}
+
 /* The data manager store file handle and file name */
+
 static const char *default_device_path = PX4_STORAGEDIR "/dataman";
 static char *k_data_manager_device_path = nullptr;
+
+static void set_device_path_based_on_mav_sys_id()
+{
+	if (zone_id == 1) {
+		default_device_path = PX4_STORAGEDIR "/dataman";
+		PX4_INFO("Using default device path: %s", default_device_path);
+	} else if (zone_id == 2) {
+		PX4_INFO("Using zone 2 device path");
+		default_device_path = PX4_STORAGEDIR "/dataman1";
+	}
+}
 
 static enum {
 	BACKEND_NONE = 0,
@@ -905,6 +930,8 @@ static int backend_check()
 int
 dataman_main(int argc, char *argv[])
 {
+	initialize_parameters();
+	set_device_path_based_on_mav_sys_id();
 	if (argc < 2) {
 		usage();
 		return -1;

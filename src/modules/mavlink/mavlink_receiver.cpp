@@ -292,6 +292,9 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_TARGET_LOCATION_XY:
 		handle_message_target_location(msg);
 		break;
+	case MAVLINK_MSG_ID_TARGET_LOCATION_LLA:
+		handle_message_target_location_lla(msg);
+		break;
 
 #if !defined(CONSTRAINED_FLASH)
 
@@ -569,8 +572,8 @@ void MavlinkReceiver::handle_message_command_both(mavlink_message_t *msg, const 
 	if (!target_ok) {
 		if (!_mavlink.get_forwarding_on()
 		    || !_mavlink.component_was_seen(cmd_mavlink.target_system, cmd_mavlink.target_component, _mavlink)) {
-			PX4_INFO("Ignore command %d from %d/%d to %d/%d",
-				 cmd_mavlink.command, msg->sysid, msg->compid, cmd_mavlink.target_system, cmd_mavlink.target_component);
+			//PX4_INFO("Ignore command %d from %d/%d to %d/%d",
+				 //cmd_mavlink.command, msg->sysid, msg->compid, cmd_mavlink.target_system, cmd_mavlink.target_component);
 		}
 
 		return;
@@ -2875,6 +2878,23 @@ MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg)
 	target_location_topic.target_y = target_location_msg.target_y;
 	_target_location_pub.publish(target_location_topic);
 }
+
+void
+MavlinkReceiver::handle_message_target_location_lla(mavlink_message_t *msg)
+{
+	mavlink_target_location_lla_t target_location_msg;
+	mavlink_msg_target_location_lla_decode(msg, &target_location_msg);
+
+	target_location_lla_s target_location_lla_topic{};
+
+	target_location_lla_topic.timestamp = hrt_absolute_time();
+	target_location_lla_topic.target_lat = target_location_msg.target_lat;
+	target_location_lla_topic.target_lon = target_location_msg.target_lon;
+	target_location_lla_topic.target_alt = target_location_msg.target_alt;
+	_target_location_lla_pub.publish(target_location_lla_topic);
+}
+
+
 
 void
 MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)

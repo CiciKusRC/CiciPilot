@@ -118,6 +118,43 @@ FixedwingAttitudeControl::vehicle_manual_poll(const float yaw_body)
 	}
 }
 
+
+void
+FixedwingAttitudeControl::vision_based_nav(const float yaw_body, const float dt)
+{
+	PX4_INFO("vision_based_nav");
+	if (_target_location_sub.update(&_target_location)) {
+		target_x = _target_location.target_x;
+		target_y = _target_location.target_y;
+	}
+	x_err_center = CENTER_X - target_x;
+	y_err_center = CENTER_Y - target_y;
+
+	// Convert x_err_center and y_err_center to roll and pitch setpoints
+	float roll_setpoint = M_DEG_TO_RAD_F*constrain(-x_err_center * _param_fw_roll_scale.get(), -_param_fw_man_r_max.get(), _param_fw_man_r_max.get());
+	float pitch_setpoint = M_DEG_TO_RAD_F*constrain(y_err_center * _param_fw_pitch_scale.get(), -_param_fw_man_p_max.get(), _param_fw_man_p_max.get());
+	roll_setpoint = _roll_vis_slew_rate.update(roll_setpoint, dt);
+	pitch_setpoint = _pitch_vis_slew_rate.update(pitch_setpoint, dt);
+	// Generate attitude setpoint quaternion
+	const Quatf q_sp(Eulerf(roll_setpoint, pitch_setpoint,yaw_body));
+	q_sp.copyTo(_att_sp.q_d);
+
+	_att_sp.reset_integral = false;
+	_att_sp.timestamp = hrt_absolute_time();
+
+	// Publish the attitude setpoint
+	_attitude_sp_pub.publish(_att_sp);
+
+	// Publish the visual location
+	_visual_location.timestamp = hrt_absolute_time();
+	_visual_location.x_err = x_err_center;
+	_visual_location.y_err = y_err_center;
+	_visual_location.roll_sp = roll_setpoint;
+	_visual_location.pitch_sp = pitch_setpoint;
+	_visual_location_pub.publish(_visual_location);
+}
+
+
 void
 FixedwingAttitudeControl::vehicle_attitude_setpoint_poll()
 {
@@ -179,6 +216,8 @@ void FixedwingAttitudeControl::Run()
 	// only run controller if attitude changed
 	if (_att_sub.updated() || (hrt_elapsed_time(&_last_run) > 20_ms)) {
 
+
+
 		// only update parameters if they changed
 		const bool params_updated = _parameter_update_sub.updated();
 
@@ -190,8 +229,11 @@ void FixedwingAttitudeControl::Run()
 
 			// update parameters from storage
 			updateParams();
+			_roll_vis_slew_rate.setSlewRate(radians(_param_fw_pn_r_slew_max.get()));
+			_pitch_vis_slew_rate.setSlewRate(radians(_param_fw_pn_r_slew_max.get()));
 			parameters_update();
 		}
+
 
 		float dt = 0.f;
 
@@ -201,6 +243,7 @@ void FixedwingAttitudeControl::Run()
 		vehicle_attitude_s att{};
 
 		if (_att_sub.copy(&att)) {
+			// get dt from attitude message
 			dt = math::constrain((att.timestamp_sample - _last_run) * 1e-6f, DT_MIN, DT_MAX);
 			_last_run = att.timestamp_sample;
 
@@ -255,6 +298,10 @@ void FixedwingAttitudeControl::Run()
 		const matrix::Eulerf euler_angles(_R);
 
 		vehicle_manual_poll(euler_angles.psi());
+		if(_param_fw_vis_nav_en.get()==1){
+			vision_based_nav(euler_angles.psi(),dt);
+		}
+
 
 		vehicle_attitude_setpoint_poll();
 
