@@ -171,6 +171,6 @@ popd >/dev/null
 
 
 kill -9 $SIM_PID
-if [[ ! -n "$HEADLESS" ]]; then
-	kill -9 $GUI_PID
-fi
+# if [[ ! -n "$HEADLESS" ]]; then
+# 	kill -9 $GUI_PID
+# fi

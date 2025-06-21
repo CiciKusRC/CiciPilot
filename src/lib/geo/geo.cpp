@@ -448,7 +448,7 @@ matrix::Vector3f calculateLOSRate(const float control_interval, const matrix::Ve
 
 	float pitchSp = _pitch_ref;
 
-	return matrix::Vector3f(closingVelocity, desiredPitchRate, pitchSp * M_RAD_TO_DEG_F);
+	return matrix::Vector3f(closingVelocity, losRate, pitchSp * M_RAD_TO_DEG_F);
 }
 
 void calculateRollAndPitch(float azimuthRate, float elevationRate, float speed, float &roll, float &pitch) {

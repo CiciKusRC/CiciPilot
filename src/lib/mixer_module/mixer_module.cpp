@@ -457,7 +457,7 @@ bool MixingOutput::update()
 
 	// Send output if any function mapped or one last disabling sample
 	if (!all_disabled || !_was_all_disabled) {
-		if (!_armed.armed && !_armed.manual_lockdown) {
+		if (!_armed.manual_lockdown) {
 			_actuator_test.overrideValues(outputs, _max_num_outputs);
 		}
 

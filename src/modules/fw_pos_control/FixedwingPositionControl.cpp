@@ -1045,7 +1045,7 @@ FixedwingPositionControl::control_auto_kamikaze(const float control_interval, co
 			hrt_abstime now = hrt_absolute_time();
 			hrt_abstime loiter_time = (now-loiter_start_time);
 			//PX4_INFO("target_heading-heading:%f",fabs(target_heading-heading));
-			if (loiter_time > 10 && dist_to_exit_point < 10.0f && fabs(target_heading-heading)<5.0f) {
+			if (loiter_time > 10 && dist_to_exit_point < 10.0f && fabs(target_heading-heading)<MAX_BETA_FOR_APPROACH) {
 
 				_kamikaze_mode_phase_curr = KKZ_MODE_FLYING_TO_TARGET;
 			}
@@ -1088,7 +1088,7 @@ FixedwingPositionControl::control_auto_kamikaze(const float control_interval, co
 		case KKZ_MODE_RECOVERING: {
 			control_auto_recovery(control_interval,pos_sp_next);
 			// Kurtarma işlemleri
-			if (fabs(_local_pos.z) > _kkz_rec_alt+30.0f) {
+			if (fabs(_local_pos.z) > _kkz_rec_alt) {
 				_kamikaze_mode_phase_curr = KKZ_MODE_RETURN_TO_SAFE_POINT;
 			}
 			break;

@@ -127,6 +127,7 @@ set(msg_files
 	LedControl.msg
 	LoggerStatus.msg
 	LogMessage.msg
+	LosRate.msg
 	MagnetometerBiasEstimate.msg
 	MagWorkerData.msg
 	ManualControlSwitches.msg
@@ -209,6 +210,7 @@ set(msg_files
 	TakeoffStatus.msg
 	TargetLocation.msg
 	TargetLocationLla.msg
+	TargetUavLocation.msg
 	TaskStackInfo.msg
 	TecsStatus.msg
 	TelemetryStatus.msg
@@ -242,33 +244,34 @@ set(msg_files
 	WheelEncoders.msg
 	Wind.msg
 	YawEstimatorStatus.msg
-	versioned/ActuatorMotors.msg
-	versioned/ActuatorServos.msg
-	versioned/ArmingCheckReply.msg
-	versioned/ArmingCheckRequest.msg
-	versioned/BatteryStatus.msg
-	versioned/ConfigOverrides.msg
-	versioned/GotoSetpoint.msg
-	versioned/HomePosition.msg
-	versioned/ManualControlSetpoint.msg
-	versioned/ModeCompleted.msg
-	versioned/RegisterExtComponentReply.msg
-	versioned/RegisterExtComponentRequest.msg
-	versioned/TrajectorySetpoint.msg
-	versioned/UnregisterExtComponent.msg
-	versioned/VehicleAngularVelocity.msg
-	versioned/VehicleAttitude.msg
-	versioned/VehicleAttitudeSetpoint.msg
-	versioned/VehicleCommandAck.msg
-	versioned/VehicleCommand.msg
-	versioned/VehicleControlMode.msg
-	versioned/VehicleGlobalPosition.msg
-	versioned/VehicleLandDetected.msg
-	versioned/VehicleLocalPosition.msg
-	versioned/VehicleOdometry.msg
-	versioned/VehicleRatesSetpoint.msg
-	versioned/VehicleStatus.msg
-	versioned/VtolVehicleStatus.msg
+	SimulinkCustomMessage.msg
+	ActuatorMotors.msg
+	ActuatorServos.msg
+	ArmingCheckReply.msg
+	ArmingCheckRequest.msg
+	BatteryStatus.msg
+	ConfigOverrides.msg
+	GotoSetpoint.msg
+	HomePosition.msg
+	ManualControlSetpoint.msg
+	ModeCompleted.msg
+	RegisterExtComponentReply.msg
+	RegisterExtComponentRequest.msg
+	TrajectorySetpoint.msg
+	UnregisterExtComponent.msg
+	VehicleAngularVelocity.msg
+	VehicleAttitude.msg
+	VehicleAttitudeSetpoint.msg
+	VehicleCommandAck.msg
+	VehicleCommand.msg
+	VehicleControlMode.msg
+	VehicleGlobalPosition.msg
+	VehicleLandDetected.msg
+	VehicleLocalPosition.msg
+	VehicleOdometry.msg
+	VehicleRatesSetpoint.msg
+	VehicleStatus.msg
+	VtolVehicleStatus.msg
 )
 list(SORT msg_files)
 

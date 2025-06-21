@@ -180,6 +180,9 @@ static constexpr float ROLL_WARNING_CAN_RUN_THRESHOLD = 0.9f;
 // [s] slew rate with which we change altitude time constant
 static constexpr float TECS_ALT_TIME_CONST_SLEW_RATE = 1.0f;
 
+// [deg] maximum allowed beta angle for switching to approach phase
+static constexpr float MAX_BETA_FOR_APPROACH = 20.0f;
+
 class FixedwingPositionControl final : public ModuleBase<FixedwingPositionControl>, public ModuleParams,
 	public px4::WorkItem
 {

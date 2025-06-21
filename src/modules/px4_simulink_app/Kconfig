@@ -1,0 +1,12 @@
+menuconfig MODULES_PX4_SIMULINK_APP
+	bool "Simulink Application"
+	default n
+	---help---
+		Enable support for Simulink
+
+menuconfig USER_PX4_SIMULINK_APP
+	bool "Simulink Application running as userspace module"
+	default y
+	depends on BOARD_PROTECTED && MODULES_PX4_SIMULINK_APP
+	---help---
+		Put PX4_SIMULINK_APP in userspace memory

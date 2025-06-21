@@ -806,7 +806,7 @@ int CanIface::init(const uavcan::uint32_t bitrate, const OperatingMode mode)
 	uint32_t ram_offset = iface_ram_base;
 
 	// Standard ID Filters: Allow space for 128 filters (128 words)
-	const uint8_t n_stdid = 128;
+	const uint8_t n_stdid = 0;
 	message_ram_.StdIdFilterSA = gl_ram_base + ram_offset * WORD_LENGTH;
 	can_->SIDFC = ((n_stdid << FDCAN_SIDFC_LSS_Pos)
 		       | ram_offset << FDCAN_SIDFC_FLSSA_Pos);

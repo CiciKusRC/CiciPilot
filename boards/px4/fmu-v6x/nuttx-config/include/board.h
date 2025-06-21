@@ -375,7 +375,7 @@
 #define GPIO_USART2_RX   GPIO_USART2_RX_1       /* PA3   */
 #define GPIO_USART2_TX   GPIO_USART2_TX_2       /* PD5   */
 #define GPIO_USART2_RTS  GPIO_USART2_RTS_2      /* PD4   */
-#define GPIO_USART2_CTS  GPIO_USART2_CTS_NSS_2  /* PD3   */
+#define GPIO_USART2_CTS  (GPIO_USART2_CTS_NSS_2 | GPIO_PULLDOWN)  /* PD3   */
 
 #define GPIO_USART3_RX   GPIO_USART3_RX_3   /* PD9   */
 #define GPIO_USART3_TX   GPIO_USART3_TX_3   /* PD8   */
@@ -388,6 +388,7 @@
 // GPIO_UART5_RTS   no remap                /* PC8  */
 #undef GPIO_UART5_CTS
 #define GPIO_UART5_CTS   ((GPIO_ALT|GPIO_AF8|GPIO_PORTC|GPIO_PIN9) | GPIO_PULLDOWN) /* PC9  */
+#define GPIO_UART5_CTS   ((GPIO_ALT|GPIO_AF8|GPIO_PORTC|GPIO_PIN9) | GPIO_PULLDOWN) /* PC9  */
 
 
 #define GPIO_USART6_RX   GPIO_USART6_RX_1   /* PC7 */
@@ -395,7 +396,7 @@
 
 #define GPIO_UART7_RX    GPIO_UART7_RX_4    /* PF6  */
 #define GPIO_UART7_TX    GPIO_UART7_TX_3    /* PE8  */
-#define GPIO_UART7_RTS   GPIO_UART7_RTS_2   /* PF8  */
+#define GPIO_UART7_RTS   (GPIO_UART7_RTS_2 | GPIO_PULLDOWN)   /* PF8  */
 #define GPIO_UART7_CTS   (GPIO_UART7_CTS_1 | GPIO_PULLDOWN)   /* PE10 */
 
 #define GPIO_UART8_RX    GPIO_UART8_RX_1    /* PE0 */

@@ -295,6 +295,9 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_TARGET_LOCATION_LLA:
 		handle_message_target_location_lla(msg);
 		break;
+	case MAVLINK_MSG_ID_TARGET_UAV_LOCATION:
+		handle_message_target_uav_location(msg);
+		break;
 
 #if !defined(CONSTRAINED_FLASH)
 
@@ -2894,8 +2897,23 @@ MavlinkReceiver::handle_message_target_location_lla(mavlink_message_t *msg)
 	_target_location_lla_pub.publish(target_location_lla_topic);
 }
 
+void
+MavlinkReceiver::handle_message_target_uav_location(mavlink_message_t *msg)
+{
+	mavlink_target_uav_location_t target_uav_location_msg;
+	mavlink_msg_target_uav_location_decode(msg, &target_uav_location_msg);
 
+	target_uav_location_s target_uav_location_topic{};
 
+	target_uav_location_topic.timestamp = hrt_absolute_time();
+	target_uav_location_topic.target_system = target_uav_location_msg.target_system;
+	target_uav_location_topic.latitude = target_uav_location_msg.latitude;
+	target_uav_location_topic.longitude = target_uav_location_msg.longitude;
+	target_uav_location_topic.altitude = target_uav_location_msg.altitude;
+	target_uav_location_topic.time_usec = target_uav_location_msg.time_usec;
+
+	_target_uav_location_pub.publish(target_uav_location_topic);
+}
 void
 MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)
 {
