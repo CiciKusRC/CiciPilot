@@ -116,6 +116,7 @@
 #include <uORB/topics/target_location.h>
 #include <uORB/topics/target_location_lla.h>
 #include <uORB/topics/target_uav_location.h>
+#include <uORB/topics/multi_vehicle_location.h>
 
 #if !defined(CONSTRAINED_FLASH)
 # include <uORB/topics/debug_array.h>
@@ -210,6 +211,7 @@ private:
 	void handle_message_target_location(mavlink_message_t *msg);
 	void handle_message_target_location_lla(mavlink_message_t *msg);
 	void handle_message_target_uav_location(mavlink_message_t *msg);
+	void handle_message_multivehicle_location(mavlink_message_t *msg);
 
 #if defined(MAVLINK_MSG_ID_SET_VELOCITY_LIMITS) // For now only defined if development.xml is used
 	void handle_message_set_velocity_limits(mavlink_message_t *msg);
@@ -341,6 +343,7 @@ private:
 	uORB::Publication<target_location_s> 			_target_location_pub{ORB_ID(target_location)};
 	uORB::Publication<target_location_lla_s> 		_target_location_lla_pub{ORB_ID(target_location_lla)};
 	uORB::Publication<target_uav_location_s> 		_target_uav_location_pub{ORB_ID(target_uav_location)};
+	uORB::Publication<multi_vehicle_location_s>		_multivehicle_location_pub{ORB_ID(multi_vehicle_location)};
 #if !defined(CONSTRAINED_FLASH)
 	uORB::Publication<debug_array_s>			_debug_array_pub {ORB_ID(debug_array)};
 	uORB::Publication<debug_key_value_s>			_debug_key_value_pub{ORB_ID(debug_key_value)};

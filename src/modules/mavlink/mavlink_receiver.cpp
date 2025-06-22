@@ -298,6 +298,9 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_TARGET_UAV_LOCATION:
 		handle_message_target_uav_location(msg);
 		break;
+	case MAVLINK_MSG_ID_MULTIVEHICLE_LOCATION:
+		handle_message_multivehicle_location(msg);
+		break;
 
 #if !defined(CONSTRAINED_FLASH)
 
@@ -2914,6 +2917,35 @@ MavlinkReceiver::handle_message_target_uav_location(mavlink_message_t *msg)
 
 	_target_uav_location_pub.publish(target_uav_location_topic);
 }
+
+void
+MavlinkReceiver::handle_message_multivehicle_location(mavlink_message_t *msg)
+{
+	mavlink_multivehicle_location_t multivehicle_location_msg;
+	mavlink_msg_multivehicle_location_decode(msg, &multivehicle_location_msg);
+
+	multi_vehicle_location_s multivehicle_location_topic{};
+
+	multivehicle_location_topic.timestamp = hrt_absolute_time();
+	multivehicle_location_topic.target_system = multivehicle_location_msg.target_system;
+
+	multivehicle_location_topic.vehicle_1_latitude = multivehicle_location_msg.vehicle_1_latitude;
+	multivehicle_location_topic.vehicle_1_longitude = multivehicle_location_msg.vehicle_1_longitude;
+	multivehicle_location_topic.vehicle_1_altitude = multivehicle_location_msg.vehicle_1_altitude;
+
+	multivehicle_location_topic.vehicle_2_latitude = multivehicle_location_msg.vehicle_2_latitude;
+	multivehicle_location_topic.vehicle_2_longitude = multivehicle_location_msg.vehicle_2_longitude;
+	multivehicle_location_topic.vehicle_2_altitude = multivehicle_location_msg.vehicle_2_altitude;
+
+	multivehicle_location_topic.vehicle_3_latitude = multivehicle_location_msg.vehicle_3_latitude;
+	multivehicle_location_topic.vehicle_3_longitude = multivehicle_location_msg.vehicle_3_longitude;
+	multivehicle_location_topic.vehicle_3_altitude = multivehicle_location_msg.vehicle_3_altitude;
+
+	multivehicle_location_topic.time_usec = multivehicle_location_msg.time_usec;
+
+	_multivehicle_location_pub.publish(multivehicle_location_topic);
+}
+
 void
 MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)
 {
