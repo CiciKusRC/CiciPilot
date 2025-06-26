@@ -66,6 +66,7 @@ enum PX4_CUSTOM_SUB_MODE_AUTO {
 	PX4_CUSTOM_SUB_MODE_AUTO_PRECLAND,
 	PX4_CUSTOM_SUB_MODE_AUTO_KAMIKAZE,
 	PX4_CUSTOM_SUB_MODE_AUTO_INTERCEPT,
+	PX4_CUSTOM_SUB_MODE_AUTO_SWARM,
 	PX4_CUSTOM_SUB_MODE_AUTO_VTOL_TAKEOFF,
 	PX4_CUSTOM_SUB_MODE_EXTERNAL1,
 	PX4_CUSTOM_SUB_MODE_EXTERNAL2,
@@ -150,6 +151,11 @@ static inline union px4_custom_mode get_px4_custom_mode(uint8_t nav_state)
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT:
 		custom_mode.main_mode = PX4_CUSTOM_MAIN_MODE_AUTO;
 		custom_mode.sub_mode = PX4_CUSTOM_SUB_MODE_AUTO_INTERCEPT;
+		break;
+
+	case vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM:
+		custom_mode.main_mode = PX4_CUSTOM_MAIN_MODE_AUTO;
+		custom_mode.sub_mode = PX4_CUSTOM_SUB_MODE_AUTO_SWARM;
 		break;
 
 	case vehicle_status_s::NAVIGATION_STATE_DESCEND:

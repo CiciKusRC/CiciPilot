@@ -161,6 +161,7 @@ bool CRSFTelemetry::send_flight_mode()
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND:
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_KAMIKAZE:
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT:
+	case vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM:
 		flight_mode = "Auto";
 		break;
 

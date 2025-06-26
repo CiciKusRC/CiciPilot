@@ -77,6 +77,7 @@ Navigator::Navigator() :
 	_takeoff(this),
 	_kamikaze(this),
 	_intercept(this),
+	_swarm(this),
 #if CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 	_vtol_takeoff(this),
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
@@ -96,6 +97,7 @@ Navigator::Navigator() :
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 	_navigation_mode_array[7] = &_kamikaze;
 	_navigation_mode_array[8] = &_intercept;
+	_navigation_mode_array[9] = &_swarm;
 
 	/* iterate through navigation modes and initialize _mission_item for each */
 	for (unsigned int i = 0; i < NAVIGATOR_MODE_ARRAY_SIZE; i++) {
@@ -819,6 +821,12 @@ void Navigator::run()
 		case vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT:
 			_pos_sp_triplet_published_invalid_once = false;
 			navigation_mode_new = &_intercept;
+			break;
+
+		case vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM:
+			_pos_sp_triplet_published_invalid_once = false;
+			PX4_INFO("Switching to SWARM mode");
+			navigation_mode_new = &_swarm;
 			break;
 
 		case vehicle_status_s::NAVIGATION_STATE_AUTO_LAND:

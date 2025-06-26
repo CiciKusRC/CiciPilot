@@ -586,6 +586,7 @@ int8_t ManualControl::navStateFromParam(int32_t param_value)
 		case 15: return vehicle_status_s::NAVIGATION_STATE_AUTO_VTOL_TAKEOFF;
 		case 16: return vehicle_status_s::NAVIGATION_STATE_AUTO_KAMIKAZE;
 		case 17: return vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT;
+		case 18: return vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM;
 		case 100: return vehicle_status_s::NAVIGATION_STATE_EXTERNAL1;
 		case 101: return vehicle_status_s::NAVIGATION_STATE_EXTERNAL2;
 		case 102: return vehicle_status_s::NAVIGATION_STATE_EXTERNAL3;

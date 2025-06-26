@@ -418,6 +418,11 @@ int Commander::custom_command(int argc, char *argv[])
 							 PX4_CUSTOM_SUB_MODE_AUTO_INTERCEPT);
 			}
 
+			else if (!strcmp(argv[1], "auto:swarm")) {
+				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_AUTO,
+									 PX4_CUSTOM_SUB_MODE_AUTO_SWARM);
+			}
+
 			else if (!strcmp(argv[1], "auto:precland")) {
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_AUTO,
 						     PX4_CUSTOM_SUB_MODE_AUTO_PRECLAND);
@@ -858,6 +863,10 @@ Commander::handle_command(const vehicle_command_s &cmd)
 							break;
 						case PX4_CUSTOM_SUB_MODE_AUTO_INTERCEPT:
 							desired_nav_state = vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT;
+							break;
+
+						case PX4_CUSTOM_SUB_MODE_AUTO_SWARM:
+							desired_nav_state = vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM;
 							break;
 
 						case PX4_CUSTOM_SUB_MODE_EXTERNAL1...PX4_CUSTOM_SUB_MODE_EXTERNAL8:

@@ -270,6 +270,7 @@ private:
 		FW_POSCTRL_MODE_AUTO_PATH,
 		FW_POSCTRL_MODE_AUTO_KAMIKAZE,
 		FW_POSCTRL_MODE_AUTO_GEO_INTERCEPT,
+		FW_POSCTRL_MODE_AUTO_SWARM,
 		FW_POSCTRL_MODE_MANUAL_POSITION,
 		FW_POSCTRL_MODE_MANUAL_ALTITUDE,
 		FW_POSCTRL_MODE_TRANSITION_TO_HOVER_LINE_FOLLOW,
@@ -668,6 +669,15 @@ private:
 	 */
 
 	void control_auto_kamikaze(const float control_interval, const Vector2d &curr_pos,
+				const Vector2f &ground_speed, const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr,
+				const position_setpoint_s &pos_sp_next);
+
+	/**
+	 *
+	 * control auto swarm mode
+	 * @param control_interval Time since last position control call [s]*
+	 */
+	void control_auto_swarm(const float control_interval, const Vector2d &curr_pos,
 				const Vector2f &ground_speed, const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr,
 				const position_setpoint_s &pos_sp_next);
 

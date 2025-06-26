@@ -425,11 +425,16 @@ OSDatxxxx::get_flight_mode(uint8_t nav_state)
 		break;
 
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_KAMIKAZE:
-		flight_mode = "KAMIKAZE"
+		flight_mode = "KAMIKAZE";
+		break;
 	}
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT:
-		flight_mode = "INTERCEPT"
+		flight_mode = "INTERCEPT";
+		break;
 	}
+	case vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM:
+		flight_mode = "SWARM";
+		break;
 
 
 	return flight_mode;

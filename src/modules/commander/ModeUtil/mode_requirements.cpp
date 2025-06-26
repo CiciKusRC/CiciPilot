@@ -170,6 +170,12 @@ void getModeRequirements(uint8_t vehicle_type, failsafe_flags_s &flags)
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT, flags.mode_req_local_alt);
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_INTERCEPT, flags.mode_req_local_position);
 
+	// NAVIGATION_STATE_AUTO_SWARM
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM, flags.mode_req_angular_velocity);
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM, flags.mode_req_attitude);
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM, flags.mode_req_local_alt);
+	setRequirement(vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM, flags.mode_req_local_position);
+
 	// NAVIGATION_STATE_ORBIT
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_ORBIT, flags.mode_req_angular_velocity);
 	setRequirement(vehicle_status_s::NAVIGATION_STATE_ORBIT, flags.mode_req_attitude);
@@ -186,7 +192,7 @@ void getModeRequirements(uint8_t vehicle_type, failsafe_flags_s &flags)
 
 	// NAVIGATION_STATE_EXTERNALx: handled outside
 
-	static_assert(vehicle_status_s::NAVIGATION_STATE_MAX == 31, "update mode requirements");
+	static_assert(vehicle_status_s::NAVIGATION_STATE_MAX == 32, "update mode requirements");
 }
 
 } // namespace mode_util

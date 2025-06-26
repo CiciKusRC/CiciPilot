@@ -1116,3 +1116,31 @@ PARAM_DEFINE_FLOAT(KKZ_LOITER_RAD, 100.f);
  * @group Kamikaze
  */
 PARAM_DEFINE_INT32(KKZ_LOITER_DIR, 0);
+
+/**
+ * Swarm follow offset
+ *
+ * Offset distance to maintain from the leader in swarm following mode.
+ *
+ * @unit m
+ * @min 0.0
+ * @max 100.0
+ * @decimal 1
+ * @increment 0.5
+ * @group Kamikaze
+ */
+PARAM_DEFINE_FLOAT(SW_FOLLOW_OFFSET, 50.0f);
+
+/**
+ * Swarm follow side
+ *
+ * Specifies which side (right or left) to follow the leader in swarm following mode.
+ *
+ * @min 0
+ * @max 1
+ * @value 0 Right
+ * @value 1 Left
+ * @value 2 Back
+ * @group Kamikaze
+ */
+PARAM_DEFINE_FLOAT(SW_FOLLOW_SIDE, 0);

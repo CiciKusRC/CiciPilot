@@ -49,6 +49,7 @@ set(NAVIGATOR_SOURCES
 	takeoff.cpp
 	kamikaze.cpp
 	intercept.cpp
+	swarm.cpp
 	land.cpp
 	precland.cpp
 	mission_feasibility_checker.cpp

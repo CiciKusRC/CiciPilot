@@ -51,6 +51,7 @@
 #include "takeoff.h"
 #include "kamikaze.h"
 #include "intercept.h"
+#include "swarm.h"
 #if CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 #include "vtol_takeoff.h"
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
@@ -97,7 +98,7 @@ using namespace time_literals;
 /**
  * Number of navigation modes that need on_active/on_inactive calls
  */
-#define NAVIGATOR_MODE_ARRAY_SIZE 9
+#define NAVIGATOR_MODE_ARRAY_SIZE 10
 
 class Navigator : public ModuleBase<Navigator>, public ModuleParams
 {
@@ -370,10 +371,12 @@ private:
 	VtolTakeoff	_vtol_takeoff;			/**< class for handling VEHICLE_CMD_NAV_VTOL_TAKEOFF command */
 #endif //CONFIG_MODE_NAVIGATOR_VTOL_TAKEOFF
 	Kamikaze	_kamikaze;			/**< class for handling kamikaze commands */
-	Intercept	_intercept;			/**< class for handling intercept commands */
+	Intercept	_intercept;
+	Swarm		_swarm;				/**< class for handling intercept commands */
 	Land		_land;				/**< class for handling land commands */
 	PrecLand	_precland;			/**< class for handling precision land commands */
 	RTL 		_rtl;				/**< class that handles RTL */
+				/**< class that handles swarm commands */
 #if CONFIG_NAVIGATOR_ADSB
 	AdsbConflict 	_adsb_conflict;			/**< class that handles ADSB conflict avoidance */
 	traffic_buffer_s _traffic_buffer{};

@@ -125,6 +125,17 @@ void getVehicleControlMode(uint8_t nav_state, uint8_t vehicle_type,
 		vehicle_control_mode.flag_control_intercept_enable = true;
 		break;
 
+	case vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM:
+		vehicle_control_mode.flag_control_position_enabled = true;
+		vehicle_control_mode.flag_control_velocity_enabled = true;
+		vehicle_control_mode.flag_control_altitude_enabled = true;
+		vehicle_control_mode.flag_control_climb_rate_enabled = true;
+		vehicle_control_mode.flag_control_auto_enabled = true;
+		vehicle_control_mode.flag_control_attitude_enabled = true;
+		vehicle_control_mode.flag_control_rates_enabled = true;
+		vehicle_control_mode.flag_control_allocation_enabled = true;
+		vehicle_control_mode.flag_control_swarm_enable = true;
+		break;
 
 	case vehicle_status_s::NAVIGATION_STATE_ACRO:
 		vehicle_control_mode.flag_control_manual_enabled = true;
