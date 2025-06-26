@@ -78,6 +78,7 @@
 #include <uORB/topics/vehicle_command.h>
 #include <uORB/topics/vehicle_command_ack.h>
 #include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/wingman_position.h>
 
 #include "mavlink_command_sender.h"
 #include "mavlink_events.h"

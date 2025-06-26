@@ -48,7 +48,10 @@
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/Publication.hpp>
 #include <uORB/topics/multi_vehicle_location.h>
+#include <uORB/topics/wingman_position.h>
 
+
+using matrix::Vector3f;
 using namespace time_literals;
 
 class Swarm : public MissionBlock , public ModuleParams
@@ -63,6 +66,9 @@ private:
 	float vehicle1_lat{0.0f}; // Vehicle 1 latitude in degrees
 	float vehicle1_lon{0.0f}; // Vehicle 1 longitude in degrees
 	float vehicle1_alt{0.0f}; // Vehicle 1 altitude in meters
+	float vehicle1_heading{0.0f}; // Vehicle 1 heading in degrees
+	matrix::Vector3f _leader_position{}; // Vehicle 1 position: x=lat, y=lon, z=alt
+
 	/**
 	 * @brief Parameters update
 	 *
@@ -70,11 +76,18 @@ private:
 	 */
 
 
-	matrix::Vector3f calculate_wingman_position(const matrix::Vector3f &leader_position, float offset);
-	void calculate_loiter_position();
-	void calc_loiter_exit_position();
+	/**
+	 * @brief Calculates the wingman position based on leader's position, offset, side, and heading.
+	 *
+	 * @param leader_pos The position of the leader (x=lat, y=lon, z=alt).
+	 * @param offset The distance offset from the leader.
+	 * @param follow_side The side to follow (-1 for left, 1 for right).
+	 * @param leader_heading_deg The heading of the leader in degrees.
+	 * @param wingman_position Output parameter for the calculated wingman position.
+	 */
+	void calculate_wingman_position(const Vector3f &leader_pos, float offset, int follow_side, float leader_heading_deg, Vector3f &wingman_position);
 
-   	DEFINE_PARAMETERS(
+	DEFINE_PARAMETERS(
 		(ParamFloat<px4::params::SW_FOLLOW_OFFSET>) _param_sw_follow_offset,
 		(ParamFloat<px4::params::SW_FOLLOW_SIDE>) _param_sw_follow_side
 	)
@@ -83,4 +96,7 @@ private:
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
 	uORB::Subscription _multi_vehicle_location_sub{ORB_ID(multi_vehicle_location)};
+
+
+	uORB::Publication<wingman_position_s> _wingman_position_pub{ORB_ID(wingman_position)};
 };

@@ -55,6 +55,7 @@
 #include <uORB/Subscription.hpp>
 #include <uORB/SubscriptionMultiArray.hpp>
 #include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/wingman_position.h>
 
 #include "streams/ACTUATOR_OUTPUT_STATUS.hpp"
 #include "streams/ALTITUDE.hpp"
@@ -121,6 +122,7 @@
 #include "streams/VIBRATION.hpp"
 #include "streams/KAMIKAZE_NAV.hpp"
 #include "streams/WIND_COV.hpp"
+#include "streams/WINGMAN_POSITION.hpp"
 #if defined(MAVLINK_MSG_ID_FIGURE_EIGHT_EXECUTION_STATUS)
 #include "streams/FIGURE_EIGHT_EXECUTION_STATUS.hpp"
 #endif // MAVLINK_MSG_ID_FIGURE_EIGHT_EXECUTION_STATUS

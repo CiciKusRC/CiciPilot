@@ -119,6 +119,7 @@ set(msg_files
 	IrlockReport.msg
 	KamikazePronavStatus.msg
 	KamikazeVisualize.msg
+	WingmanPosition.msg
 	LandingGear.msg
 	LandingGearWheel.msg
 	LandingTargetInnovations.msg
