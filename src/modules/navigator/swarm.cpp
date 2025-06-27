@@ -14,7 +14,14 @@ Swarm::Swarm(Navigator *navigator) :
 }
 void Swarm::on_activation()
 {
+	_navigator->reset_cruising_speed();
+	_navigator->set_cruising_throttle();
+	PX4_INFO("Swarm mode on activation");
 
+}
+
+void Swarm::on_active()
+{
 	multi_vehicle_location_s multi_vehicle_location;
 	if (_multi_vehicle_location_sub.update(&multi_vehicle_location)) {
 		// Assume vehicle_1 is the leader
@@ -34,26 +41,10 @@ void Swarm::on_activation()
 	Vector3f wingman_position;
 	// Calculate the wingman position based on the leader's position, heading, and follow parameters
 	calculate_wingman_position(_leader_position, follow_offset, follow_side, leader_heading_deg, wingman_position);
-	_navigator->reset_cruising_speed();
-	_navigator->set_cruising_throttle();
-	PX4_INFO("Swarm mode on activation");
 
-}
-
-void Swarm::on_active()
-{
-
-	PX4_INFO("Swarm mode on active");
+	//PX4_INFO("Swarm mode on active");
 	parameters_update();
-	multi_vehicle_location_s multi_vehicle_location;
 
-	if (_multi_vehicle_location_sub.update(&multi_vehicle_location)) {
-		// Vehicle 1 latitude and longitude are in degE7, altitude in mm
-		vehicle1_lat = multi_vehicle_location.vehicle_1_latitude * 1e-7;
-		vehicle1_lon = multi_vehicle_location.vehicle_1_longitude * 1e-7;
-		vehicle1_alt = multi_vehicle_location.vehicle_1_altitude * 0.001f; // convert mm to meters
-
-	}
 }
 
 void Swarm::parameters_update()

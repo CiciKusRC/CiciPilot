@@ -825,7 +825,7 @@ void Navigator::run()
 
 		case vehicle_status_s::NAVIGATION_STATE_AUTO_SWARM:
 			_pos_sp_triplet_published_invalid_once = false;
-			PX4_INFO("Switching to SWARM mode");
+			//PX4_INFO("Switching to SWARM mode");
 			navigation_mode_new = &_swarm;
 			break;
 

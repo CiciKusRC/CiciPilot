@@ -520,6 +520,9 @@ static const StreamListItem streams_list[] = {
 #if defined(CURRENT_MODE_HPP)
 	create_stream_list_item<MavlinkStreamCurrentMode>(),
 #endif // CURRENT_MODE_HPP
+#if defined(WINGMAN_POSITION_HPP)
+	create_stream_list_item<MavlinkStreamWingmanPosition>(),
+#endif // WINGMAN_POSITION_HPP
 };
 
 const char *get_stream_name(const uint16_t msg_id)

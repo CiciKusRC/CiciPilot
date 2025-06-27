@@ -96,7 +96,5 @@ private:
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
 	uORB::Subscription _multi_vehicle_location_sub{ORB_ID(multi_vehicle_location)};
-
-
 	uORB::Publication<wingman_position_s> _wingman_position_pub{ORB_ID(wingman_position)};
 };
