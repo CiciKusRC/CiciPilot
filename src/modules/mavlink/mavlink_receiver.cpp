@@ -2932,18 +2932,18 @@ MavlinkReceiver::handle_message_multivehicle_location(mavlink_message_t *msg)
 	multivehicle_location_topic.vehicle_1_latitude = multivehicle_location_msg.vehicle_1_latitude;
 	multivehicle_location_topic.vehicle_1_longitude = multivehicle_location_msg.vehicle_1_longitude;
 	multivehicle_location_topic.vehicle_1_altitude = multivehicle_location_msg.vehicle_1_altitude;
-	multivehicle_location_topic.vehicle_1_heading = multivehicle_location_msg.vehicle_1_heading;
+	multivehicle_location_topic.vehicle_1_heading = multivehicle_location_msg.vehicle_1_heading*1e-3f;;
 
 
 	multivehicle_location_topic.vehicle_2_latitude = multivehicle_location_msg.vehicle_2_latitude;
 	multivehicle_location_topic.vehicle_2_longitude = multivehicle_location_msg.vehicle_2_longitude;
 	multivehicle_location_topic.vehicle_2_altitude = multivehicle_location_msg.vehicle_2_altitude;
-	multivehicle_location_topic.vehicle_2_heading = multivehicle_location_msg.vehicle_2_heading;
+	multivehicle_location_topic.vehicle_2_heading = multivehicle_location_msg.vehicle_2_heading*1e-3f;
 
 	multivehicle_location_topic.vehicle_3_latitude = multivehicle_location_msg.vehicle_3_latitude;
 	multivehicle_location_topic.vehicle_3_longitude = multivehicle_location_msg.vehicle_3_longitude;
 	multivehicle_location_topic.vehicle_3_altitude = multivehicle_location_msg.vehicle_3_altitude;
-	multivehicle_location_topic.vehicle_3_heading = multivehicle_location_msg.vehicle_3_heading;
+	multivehicle_location_topic.vehicle_3_heading = multivehicle_location_msg.vehicle_3_heading*1e-3f;
 
 	multivehicle_location_topic.time_usec = multivehicle_location_msg.time_usec;
 

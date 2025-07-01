@@ -89,7 +89,25 @@ private:
 
 	DEFINE_PARAMETERS(
 		(ParamFloat<px4::params::SW_FOLLOW_OFFSET>) _param_sw_follow_offset,
-		(ParamFloat<px4::params::SW_FOLLOW_SIDE>) _param_sw_follow_side
+		(ParamFloat<px4::params::SW_FOLLOW_SIDE>) _param_sw_follow_side,
+		(ParamFloat<px4::params::SW_WAIT_LAT>) _param_sw_wait_lat,
+		(ParamFloat<px4::params::SW_WAIT_LON>) _param_sw_wait_lon,
+		(ParamFloat<px4::params::SW_ZONE1_LAT>) _param_sw_zone1_lat,
+		(ParamFloat<px4::params::SW_ZONE1_LON>) _param_sw_zone1_lon,
+		(ParamFloat<px4::params::SW_ZONE2_LAT>) _param_sw_zone2_lat,
+		(ParamFloat<px4::params::SW_ZONE2_LON>) _param_sw_zone2_lon,
+		(ParamFloat<px4::params::SW_ZONE3_LAT>) _param_sw_zone3_lat,
+		(ParamFloat<px4::params::SW_ZONE3_LON>) _param_sw_zone3_lon,
+		(ParamFloat<px4::params::SW_ZONE4_LAT>) _param_sw_zone4_lat,
+		(ParamFloat<px4::params::SW_ZONE4_LON>) _param_sw_zone4_lon,
+		(ParamFloat<px4::params::SW_AREA1_LAT>) _param_sw_area1_lat,
+		(ParamFloat<px4::params::SW_AREA1_LON>) _param_sw_area1_lon,
+		(ParamFloat<px4::params::SW_AREA2_LAT>) _param_sw_area2_lat,
+		(ParamFloat<px4::params::SW_AREA2_LON>) _param_sw_area2_lon,
+		(ParamFloat<px4::params::SW_AREA3_LAT>) _param_sw_area3_lat,
+		(ParamFloat<px4::params::SW_AREA3_LON>) _param_sw_area3_lon,
+		(ParamFloat<px4::params::SW_AREA4_LAT>) _param_sw_area4_lat,
+		(ParamFloat<px4::params::SW_AREA4_LON>) _param_sw_comp_area4_lon
 	)
 
 	void parameters_update();

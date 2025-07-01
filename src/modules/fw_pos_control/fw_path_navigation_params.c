@@ -1127,7 +1127,7 @@ PARAM_DEFINE_INT32(KKZ_LOITER_DIR, 0);
  * @max 100.0
  * @decimal 1
  * @increment 0.5
- * @group Kamikaze
+ * @group Swarm
  */
 PARAM_DEFINE_FLOAT(SW_FOLLOW_OFFSET, 50.0f);
 
@@ -1141,6 +1141,205 @@ PARAM_DEFINE_FLOAT(SW_FOLLOW_OFFSET, 50.0f);
  * @value 0 Right
  * @value 1 Left
  * @value 2 Back
- * @group Kamikaze
+ * @group Swarm
  */
 PARAM_DEFINE_FLOAT(SW_FOLLOW_SIDE, 0);
+
+
+/**
+ * Waiting point latitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_WAIT_LAT, 0.0f);
+
+/**
+ * Waiting point longitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_WAIT_LON, 0.0f);
+
+
+/**
+ * Zone border 1 latitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE1_LAT, 0.0f);
+
+/**
+ * Zone border 1 longitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE1_LON, 0.0f);
+
+/**
+ * Zone border 2 latitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE2_LAT, 0.0f);
+
+/**
+ * Zone border 2 longitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE2_LON, 0.0f);
+
+/**
+ * Zone border 3 latitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE3_LAT, 0.0f);
+
+/**
+ * Zone border 3 longitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE3_LON, 0.0f);
+
+/**
+ * Zone border 4 latitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE4_LAT, 0.0f);
+
+/**
+ * Zone border 4 longitude
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_ZONE4_LON, 0.0f);
+
+/**Competition area border 1
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA1_LAT, 0.0f);
+
+/**
+ * Competition area border 1
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA1_LON, 0.0f);
+
+/**
+ * Competition area border 2
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA2_LAT, 0.0f);
+
+/**
+ * Competition area border 2
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA2_LON, 0.0f);
+
+/**
+ * Competition area border 3
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA3_LAT, 0.0f);
+
+/**
+ * Competition area border 3
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA3_LON, 0.0f);
+
+/**
+ * Competition area border 4
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA4_LAT, 0.0f);
+
+/**
+ * Competition area border 4
+ * @unit deg
+ * @min 0.000000
+ * @max 100.000000
+ * @decimal 6
+ * @increment 0.000001
+ * @group Swarm
+ */
+PARAM_DEFINE_FLOAT(SW_AREA4_LON, 0.0f);

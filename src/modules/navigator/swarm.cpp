@@ -24,12 +24,12 @@ void Swarm::on_active()
 {
 	multi_vehicle_location_s multi_vehicle_location;
 	if (_multi_vehicle_location_sub.update(&multi_vehicle_location)) {
-		// Assume vehicle_1 is the leader
+
 		vehicle1_lat = multi_vehicle_location.vehicle_1_latitude * 1e-7;
 		vehicle1_lon = multi_vehicle_location.vehicle_1_longitude * 1e-7;
 		vehicle1_alt = multi_vehicle_location.vehicle_1_altitude * 0.001f; // mm to meters
-		vehicle1_heading = multi_vehicle_location.vehicle_1_heading * 0.01f; // cdeg to degrees
-		// Store or use leader position as needed
+		vehicle1_heading = multi_vehicle_location.vehicle_1_heading; // cdeg to degrees
+
 		_leader_position(0) = vehicle1_lat;
 		_leader_position(1) = vehicle1_lon;
 		_leader_position(2) = vehicle1_alt;
@@ -126,9 +126,10 @@ void Swarm::calculate_wingman_position(const Vector3f &leader_position, float of
 
 	wingman_position_s wingman_position_msg{};
 	wingman_position_msg.timestamp = hrt_absolute_time();
-	wingman_position_msg.wingman_latitude = wingman_position(0) * 1e7; // Convert to degE7
-	wingman_position_msg.wingman_longitude = wingman_position(1) * 1e7; // Convert to degE7
-	wingman_position_msg.wingman_altitude = wingman_position(2) * 1000.0f; // Convert to mm
+	wingman_position_msg.wingman_latitude = wingman_position(0); // Convert to degE7
+	wingman_position_msg.wingman_longitude = wingman_position(1); // Convert to degE7
+	wingman_position_msg.wingman_altitude = wingman_position(2); // Convert to mm
+	wingman_position_msg.wingman_heading = leader_heading_deg;
 	// Publish the wingman position
 	_wingman_position_pub.publish(wingman_position_msg);
 	// Publish the setpoint triplet

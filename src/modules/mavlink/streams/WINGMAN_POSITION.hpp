@@ -64,10 +64,10 @@ private:
 		if (_wingman_position_sub.update(&wingman_position)) {
 			mavlink_wingman_position_t msg{};
 			// Convert int32 latitude (in 1e7 degrees) to float degrees
-			msg.latitude = static_cast<float>(wingman_position.wingman_latitude) * 1e-7f;
-			msg.longitude = static_cast<float>(wingman_position.wingman_longitude) * 1e-7f;
-			msg.altitude  = static_cast<float>(wingman_position.wingman_altitude) * 1e-7f;
-			msg.heading   = static_cast<float>(wingman_position.wingman_heading) * 1e-7f;
+			msg.latitude = static_cast<float>(wingman_position.wingman_latitude);
+			msg.longitude = static_cast<float>(wingman_position.wingman_longitude);
+			msg.altitude  = static_cast<float>(wingman_position.wingman_altitude);
+			msg.heading   = static_cast<float>(wingman_position.wingman_heading);;
 
 			mavlink_msg_wingman_position_send_struct(_mavlink->get_channel(), &msg);
 
