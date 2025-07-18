@@ -289,13 +289,13 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 		handle_message_open_drone_id_system(msg);
 		break;
 
-	case MAVLINK_MSG_ID_TARGET_LOCATION_XY:
+	case MAVLINK_MSG_ID_TARGET_LOCATION_XY://Görüntü işlemeden gelen mesaj
 		handle_message_target_location(msg);
 		break;
 	case MAVLINK_MSG_ID_TARGET_LOCATION_LLA:
 		handle_message_target_location_lla(msg);
 		break;
-	case MAVLINK_MSG_ID_TARGET_UAV_LOCATION:
+	case MAVLINK_MSG_ID_TARGET_UAV_LOCATION://Siyi gimbalden gelen mesaj
 		handle_message_target_uav_location(msg);
 		break;
 	case MAVLINK_MSG_ID_MULTIVEHICLE_LOCATION:
@@ -2882,6 +2882,7 @@ MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg)
 	target_location_topic.timestamp = hrt_absolute_time();
 	target_location_topic.target_x = target_location_msg.target_x;
 	target_location_topic.target_y = target_location_msg.target_y;
+	target_location_topic.tracker_status = target_location_msg.tracker_status;
 	_target_location_pub.publish(target_location_topic);
 }
 

@@ -101,7 +101,7 @@ void Swarm::calculate_wingman_position(const Vector3f &leader_position, float of
 	// Convert back to degrees
 	wingman_position(0) = math::degrees(wingman_lat);
 	wingman_position(1) = math::degrees(wingman_lon);
-	wingman_position(2) = wingman_alt;
+	wingman_position(2) = wingman_alt+_navigator->get_home_position()->alt;
 	pos_sp_triplet->timestamp = hrt_absolute_time();
 
 	// Fill current (previous) with current vehicle location

@@ -1126,6 +1126,16 @@ FixedwingPositionControl::control_auto_kamikaze(const float control_interval, co
 }
 
 void
+FixedwingPositionControl::control_auto_swarm(const float control_interval, const Vector2d &curr_pos,
+					   const Vector2f &ground_speed, const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr,
+					   const position_setpoint_s &pos_sp_next)
+{
+	// Swarm control logic will be implemented here
+	// For now, we just call the auto control function
+	control_auto(control_interval, curr_pos, ground_speed, pos_sp_prev, pos_sp_curr, pos_sp_next);
+}
+
+void
 FixedwingPositionControl::control_auto_descend(const float control_interval)
 {
 	// Hard-code descend rate to 0.5m/s. This is a compromise to give the system to recover,
@@ -1821,6 +1831,7 @@ FixedwingPositionControl::control_auto_takeoff(const hrt_abstime &now, const flo
 		}
 
 		if (_skipping_takeoff_detection) {
+			PX4_INFO("Skipping takeoff detection, forcing fly state");
 			_runway_takeoff.forceSetFlyState();
 		}
 
@@ -2976,6 +2987,12 @@ FixedwingPositionControl::Run()
 
 		case FW_POSCTRL_MODE_AUTO_KAMIKAZE: {
 				control_auto_kamikaze(control_interval,curr_pos,ground_speed,_pos_sp_triplet.previous,_pos_sp_triplet.current,_pos_sp_triplet.next);
+				break;
+			}
+
+		case FW_POSCTRL_MODE_AUTO_SWARM: {
+				control_auto_swarm(control_interval, curr_pos, ground_speed, _pos_sp_triplet.previous, _pos_sp_triplet.current,
+						   _pos_sp_triplet.next);
 				break;
 			}
 
