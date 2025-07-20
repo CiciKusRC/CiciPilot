@@ -2872,7 +2872,7 @@ MavlinkReceiver::handle_message_debug_vect(mavlink_message_t *msg)
 }
 
 void
-MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg)
+MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg) //Kameradan gelen xy ve tracker bilgisi
 {
 	mavlink_target_location_xy_t target_location_msg;
 	mavlink_msg_target_location_xy_decode(msg, &target_location_msg);
@@ -2887,7 +2887,7 @@ MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg)
 }
 
 void
-MavlinkReceiver::handle_message_target_location_lla(mavlink_message_t *msg)
+MavlinkReceiver::handle_message_target_location_lla(mavlink_message_t *msg) //yerdeki kameradan gelen LLA bilgisi eski
 {
 	mavlink_target_location_lla_t target_location_msg;
 	mavlink_msg_target_location_lla_decode(msg, &target_location_msg);
@@ -2902,7 +2902,7 @@ MavlinkReceiver::handle_message_target_location_lla(mavlink_message_t *msg)
 }
 
 void
-MavlinkReceiver::handle_message_target_uav_location(mavlink_message_t *msg)
+MavlinkReceiver::handle_message_target_uav_location(mavlink_message_t *msg) //  //yerdeki kameradan gelen LLA bilgisi yeni
 {
 	mavlink_target_uav_location_t target_uav_location_msg;
 	mavlink_msg_target_uav_location_decode(msg, &target_uav_location_msg);
@@ -2914,13 +2914,13 @@ MavlinkReceiver::handle_message_target_uav_location(mavlink_message_t *msg)
 	target_uav_location_topic.latitude = target_uav_location_msg.latitude;
 	target_uav_location_topic.longitude = target_uav_location_msg.longitude;
 	target_uav_location_topic.altitude = target_uav_location_msg.altitude;
-	target_uav_location_topic.time_usec = target_uav_location_msg.time_usec;
+	target_uav_location_topic.time_usec = hrt_absolute_time();
 
 	_target_uav_location_pub.publish(target_uav_location_topic);
 }
 
 void
-MavlinkReceiver::handle_message_multivehicle_location(mavlink_message_t *msg)
+MavlinkReceiver::handle_message_multivehicle_location(mavlink_message_t *msg) // Uçakların birbirine yolladığı konum bilgisi
 {
 	mavlink_multivehicle_location_t multivehicle_location_msg;
 	mavlink_msg_multivehicle_location_decode(msg, &multivehicle_location_msg);

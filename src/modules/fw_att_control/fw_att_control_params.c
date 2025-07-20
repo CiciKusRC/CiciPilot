@@ -302,3 +302,138 @@ PARAM_DEFINE_FLOAT(FW_PITCH_SCALE,0.0417f);
  * @group FW Attitude Control
  */
 PARAM_DEFINE_INT32(FW_VIS_NAV_EN, 0);
+
+/**
+ * X-axis error proportional gain
+ *
+ * This parameter defines the proportional gain for the X-axis error controller.
+ *
+ * @unit s
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(X_ERROR_KP, 1.0f);
+
+/**
+ * X-axis error integrator gain
+ *
+ * This parameter defines the integrator gain for the X-axis error controller.
+ *
+ * @unit s
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(X_ERROR_KI, 0.0f);
+
+/**
+ * X-axis error integrator limit
+ *
+ * This parameter defines the maximum absolute value for the X-axis error integrator.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(X_INT_LIM, 1.0f);
+
+/**
+ * X-axis error integrator reset
+ *
+ * Set this parameter to 1 to reset the X-axis error integrator to zero.
+ * The parameter will automatically reset to 0 after the integrator is cleared.
+ *
+ * @boolean
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_INT32(INT_RESET_X, 0);
+
+/**
+ * X-axis roll angle limit for vision based navigation
+ *
+ * This parameter defines the maximum allowed roll angle (in degrees) for X-axis vision-based navigation corrections.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 90.0
+ * @decimal 1
+ * @increment 0.5
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(ROLL_LIM_X, 45.0f);
+
+/**
+ * Y-axis error proportional gain
+ *
+ * This parameter defines the proportional gain for the Y-axis error controller.
+ *
+ * @unit s
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(Y_ERROR_KP, 1.0f);
+
+/**
+ * Y-axis error integrator gain
+ *
+ * This parameter defines the integrator gain for the Y-axis error controller.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(Y_ERROR_KI, 0.0f);
+
+/**
+ * Y-axis error integrator limit
+ *
+ * This parameter defines the maximum absolute value for the Y-axis error integrator.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(Y_INT_LIM, 1.0f);
+
+/**
+ * Y-axis error integrator reset
+ *
+ * Set this parameter to 1 to reset the Y-axis error integrator to zero.
+ * The parameter will automatically reset to 0 after the integrator is cleared.
+ *
+ * @boolean
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_INT32(INT_RESET_Y, 0);
+
+
+/**
+ * Y-axis roll angle limit for vision based navigation
+ *
+ * This parameter defines the maximum allowed roll angle (in degrees) for Y-axis vision-based navigation corrections.
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 90.0
+ * @decimal 1
+ * @increment 0.5
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(ROLL_LIM_Y, 45.0f);
