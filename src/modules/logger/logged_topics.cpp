@@ -148,6 +148,11 @@ void LoggedTopics::add_default_topics()
 	add_topic("wind", 1000);
 	add_topic("kamikaze_pronav_status", 100);
 	add_topic("target_location", 100);
+	//add_topic("intercept_roll_pitch", 20);
+	//add_topic("intercept_debug", 20);
+	//add_topic("simulink_custom_message", 20);
+	add_topic("visual_location", 20);
+
 
 	// multi topics
 	add_optional_topic_multi("actuator_outputs", 100, 3);

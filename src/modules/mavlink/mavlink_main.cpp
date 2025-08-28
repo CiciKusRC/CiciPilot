@@ -1459,7 +1459,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("WIND_COV", 0.5f);
 		configure_stream_local("KAMIKAZE_NAV", 0.5f);
 		configure_stream_local("WINGMAN_POSITION", 10.0f);
-		configure_stream_local("TARGET_LOCATION_XY", 10.0f);
+		//configure_stream_local("TARGET_LOCATION_XY", 10.0f);
 
 #if !defined(CONSTRAINED_FLASH)
 		configure_stream_local("DEBUG", 1.0f);

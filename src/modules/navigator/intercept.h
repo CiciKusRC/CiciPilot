@@ -46,7 +46,9 @@
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/target_location_lla.h>
 #include <uORB/topics/vehicle_global_position.h>
+#include <uORB/topics/multi_vehicle_location.h>
 #include <uORB/Publication.hpp>
+
 
 using namespace time_literals;
 class Intercept : public MissionBlock , public ModuleParams
@@ -59,6 +61,7 @@ public:
 private:
 
 	vehicle_local_position_s *_local_pos{nullptr};
+	multi_vehicle_location_s _multi_vehicle_location{};
 	float target_lat{0.0f};
 	float target_lon{0.0f};
 	float target_alt{0.0f};
@@ -88,5 +91,6 @@ private:
 	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
 	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};	/**< global position subscription */
 	uORB::Subscription _target_location_lla_sub{ORB_ID(target_location_lla)};	/**< target location subscription */
+	uORB::Subscription _multi_vehicle_location_sub{ORB_ID(multi_vehicle_location)};	/**< target location subscription */
 
 };

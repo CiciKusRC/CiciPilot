@@ -123,7 +123,7 @@
 #include "streams/KAMIKAZE_NAV.hpp"
 #include "streams/WIND_COV.hpp"
 #include "streams/WINGMAN_POSITION.hpp"
-#include "streams/TARGET_LOCATION_XY.hpp"
+//#include "streams/TARGET_LOCATION_XY.hpp"
 #if defined(MAVLINK_MSG_ID_FIGURE_EIGHT_EXECUTION_STATUS)
 #include "streams/FIGURE_EIGHT_EXECUTION_STATUS.hpp"
 #endif // MAVLINK_MSG_ID_FIGURE_EIGHT_EXECUTION_STATUS

@@ -437,3 +437,129 @@ PARAM_DEFINE_INT32(INT_RESET_Y, 0);
  * @group FW Attitude Control
  */
 PARAM_DEFINE_FLOAT(ROLL_LIM_Y, 45.0f);
+
+/**
+ * Interceptor dead zone
+ *
+ * This parameter defines the dead zone for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_DZ, 0.0f);
+
+/**
+ * Interceptor slow zone
+ *
+ * This parameter defines the slow zone for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_SZ, 0.0f);
+
+/**
+ * Interceptor roll proportional gain
+ *
+ * This parameter defines the roll P gain for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_ROLL_P, 1.0f);
+
+/**
+ * Interceptor roll integrator gain
+ *
+ * This parameter defines the roll I gain for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_ROLL_I, 0.0f);
+
+/**
+ * Interceptor pitch proportional gain
+ *
+ * This parameter defines the pitch P gain for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_PITCH_P, 1.0f);
+
+/**
+ * Interceptor pitch integrator gain
+ *
+ * This parameter defines the pitch I gain for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 10.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_PITCH_I, 0.0f);
+
+/**
+ * Interceptor output limit
+ *
+ * This parameter defines the output limit for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 100.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_OUT_LIM, 1.0f);
+
+/**
+ * Interceptor integrator limit
+ *
+ * This parameter defines the integrator limit for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 100.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_INTEGRAL_LIM, 1.0f);
+
+/**
+ * Interceptor alpha filter
+ *
+ * This parameter defines the alpha filter value for the interceptor controller.
+ *
+ * @unit
+ * @min 0.0
+ * @max 1.0
+ * @decimal 3
+ * @increment 0.001
+ * @group FW Attitude Control
+ */
+PARAM_DEFINE_FLOAT(INT_ALPHA_F, 0.5f);

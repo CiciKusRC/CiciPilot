@@ -112,46 +112,166 @@ FixedwingAttitudeControl::vehicle_manual_poll(const float yaw_body)
 
 				_att_sp.timestamp = hrt_absolute_time();
 
-				_attitude_sp_pub.publish(_att_sp);
+			        _attitude_sp_pub.publish(_att_sp);
+
 			}
 		}
 	}
 }
 
 
-void
-FixedwingAttitudeControl::vision_based_nav(const float yaw_body, const float dt)
+void FixedwingAttitudeControl::computeDirectionVector(float dt, float target_x, float target_y, float roll_act, float pitch_act)
 {
-	PX4_INFO("vision_based_nav");
+    // ==== YENİ: Hedefin X Eksenindeki Kayma Hızını Hesaplama ====
+    // Bir önceki frame'deki hedef konumunu saklamak için static değişken.
+    // İlk çağrıda mevcut target_x ile başlatılır, böylece ilk hız 0 olur.
+    static float previous_target_x = target_x;
+    float target_speed_x_pixels_per_second = 0.0f;
+
+    // dt'nin çok küçük veya sıfır olmasını kontrol et (sıfıra bölme hatasını önle)
+    if (dt > 1e-6f) {
+        // Hız = Konum Değişimi / Zaman Değişimi
+        target_speed_x_pixels_per_second = (target_x - previous_target_x) / dt;
+    }
+
+    // Bir sonraki döngü için mevcut x konumunu sakla
+    previous_target_x = target_x;
+
+    // Hesaplanan hızı loglamak veya başka bir yerde kullanmak için:
+    // PX4_INFO("Hedef Hızı X: %.2f piksel/saniye", (double)target_speed_x_pixels_per_second);
+    // ===============================================================
+
+
+    // ==== 1) Piksel → fiziksel koordinat dönüşümü ====
+    /* static float target_x_f = 0.0f;
+    static float target_y_f = 0.0f;
+    const float alpha_xy = 0.1f; // 0.8-0.95 arası denenebilir
+    target_x_f = alpha_xy * target_x_f + (1.0f - alpha_xy) * ;
+    target_y_f = alpha_xy * target_y_f + (1.0f - alpha_xy) * target_y; */
+    const float sx = SENSOR_WIDTH / static_cast<float>(RESOLUTION_WIDTH);
+    const float sy = SENSOR_HEIGHT / static_cast<float>(RESOLUTION_HEIGHT);
+
+    const float cx = (RESOLUTION_WIDTH+1) / 2.0f;
+    const float cy = (RESOLUTION_HEIGHT+1) / 2.0f;
+
+    const float u = target_x - cx;
+    const float v = target_y - cy;
+
+    const float cos_roll = cosf(roll_act);
+    const float sin_roll = sinf(roll_act);
+    const float u_corrected = u * cos_roll + v * sin_roll;
+
+    x_cam = u_corrected * sx;
+    y_cam = -v * sy; // görüntü y ekseni ters
+    z_cam = FOCAL_LENGTH;
+
+    // Normalize et
+    const float norm = sqrtf(x_cam * x_cam + y_cam * y_cam + z_cam * z_cam);
+    if (norm > 1e-6f) {
+        x_cam /= norm;
+        y_cam /= norm;
+        z_cam /= norm;
+    }
+
+    matrix::Vector3f vec_cam(x_cam, y_cam, z_cam);
+
+    // ==== 2) Kamera → gövde dönüşüm matrisi ====
+    // cam_z -> body_x, cam_x -> body_y, cam_y -> body_z
+    matrix::Dcmf R_offset;
+    R_offset(0, 0) = 0.f;  R_offset(0, 1) = 0.f;  R_offset(0, 2) = 1.f; // body_x = cam_z
+    R_offset(1, 0) = 1.f;  R_offset(1, 1) = 0.f;  R_offset(1, 2) = 0.f; // body_y = cam_x
+    R_offset(2, 0) = 0.f;  R_offset(2, 1) = 1.f;  R_offset(2, 2) = 0.f; // body_z = cam_y
+
+    matrix::Vector3f vec_body = R_offset * vec_cam;
+
+    // ==== 3) Açı hesapları (singularite önleme) ====
+    float denom_x = fabsf(vec_body(0)) < 1e-3f ? copysignf(1e-3f, vec_body(0)) : vec_body(0);
+    float pitch_ref_cam = atan2f(-vec_body(2), denom_x);
+    float roll_ref_cam  = atan2f(vec_body(1), denom_x);
+
+    // ==== 4) Ölçüm yumuşatma (low-pass filter) ====
+    static float roll_f = 0.f, pitch_f = 0.f;
+    float alpha = _param_x_error_kp.get(); // 0.7..0.95 arası denenebilir
+    roll_f  = alpha * roll_f  + (1.f - alpha) * roll_ref_cam;
+    pitch_f = alpha * pitch_f + (1.f - alpha) * pitch_ref_cam;
+
+    // Check if roll_f is NaN and set to zero if so
+    if (!PX4_ISFINITE(roll_f)) {
+        roll_f = 0.f;
+    }
+    // Check if pitch_f is NaN and set to zero if so
+    if (!PX4_ISFINITE(pitch_f)) {
+        pitch_f = 0.f;
+    }
+
+
+    // ==== 5) Deadzone ====
+    float dead_roll = _param_x_error_ki.get(); // ~0.06°
+    const float dead_pitch = 0.02f; // ~1.2°
+    PX4_INFO("roll_f: %.4f", (double)roll_f);
+    if (fabsf(roll_f) < dead_roll){roll_f = 0.f;}
+    if (fabsf(pitch_f) < dead_pitch){pitch_f = 0.f;}
+
+    // ==== 7) Mevcut attitude ile harmanlama ====
+    // K_vis: vision düzeltmesinin ne kadar etkili olacağı
+    const float K_vis = 1.0f;
+    float roll_ref  = roll_act  + K_vis * roll_f;
+    float pitch_ref = pitch_act + K_vis * pitch_f;
+
+    // ==== 8) Sonuçlar ====
+    roll_pitch_ref[0] = roll_f;
+    roll_pitch_ref[1] = -pitch_f;
+
+    const float roll_limit = radians(_param_roll_lim_x.get());
+    const float pitch_limit = radians(_param_roll_lim_y.get());
+    roll_pitch_ref[0] = constrain(roll_pitch_ref[0], -roll_limit, roll_limit);
+    roll_pitch_ref[1] = constrain(roll_pitch_ref[1], -pitch_limit, pitch_limit);
+
+    PX4_INFO("roll_act: %.2f roll_ref: %.2f | pitch_act: %.2f pitch_ref: %.2f",
+             (double)roll_act, (double)roll_f,
+             (double)pitch_act, (double)pitch_f);
+
+
+
+    _visual_location.timestamp = hrt_absolute_time();
+    _visual_location.x_err = target_speed_x_pixels_per_second;
+    _visual_location.y_err = roll_f;
+    _visual_location.roll_sp = roll_pitch_ref[0];
+    _visual_location.pitch_sp = roll_pitch_ref[1];
+    _visual_location_pub.publish(_visual_location);
+}
+
+
+
+
+
+
+void
+FixedwingAttitudeControl::vision_based_nav(const float yaw_body, const float dt,float roll_act, float pitch_act)
+{
+	if (_intercept_roll_pitch_sub.update(&_intercept_roll_pitch)) {
+		target_roll =  M_DEG_TO_RAD_F*constrain(_intercept_roll_pitch.target_roll, -_param_fw_man_r_max.get(), _param_fw_man_r_max.get());
+		target_pitch = M_DEG_TO_RAD_F*constrain(_intercept_roll_pitch.target_pitch, -_param_fw_man_p_max.get(), _param_fw_man_p_max.get());
+	}
 	if (_target_location_sub.update(&_target_location)) {
 		target_x = _target_location.target_x;
 		target_y = _target_location.target_y;
 	}
-	x_err_center = CENTER_X - target_x;
-	y_err_center = CENTER_Y - target_y;
 
-	// Convert x_err_center and y_err_center to roll and pitch setpoints
-	float roll_setpoint = M_DEG_TO_RAD_F*constrain(-x_err_center * _param_fw_roll_scale.get(), -_param_fw_man_r_max.get(), _param_fw_man_r_max.get());
-	float pitch_setpoint = M_DEG_TO_RAD_F*constrain(y_err_center * _param_fw_pitch_scale.get(), -_param_fw_man_p_max.get(), _param_fw_man_p_max.get());
-	roll_setpoint = _roll_vis_slew_rate.update(roll_setpoint, dt);
-	pitch_setpoint = _pitch_vis_slew_rate.update(pitch_setpoint, dt);
-	// Generate attitude setpoint quaternion
-	const Quatf q_sp(Eulerf(roll_setpoint, pitch_setpoint,yaw_body));
+	target_roll = _roll_vis_slew_rate.update(target_roll, dt);
+	target_pitch = _pitch_vis_slew_rate.update(target_pitch, dt);
+
+
+
+/*
+	const Quatf q_sp(Eulerf(roll_pitch_ref[0], roll_pitch_ref[1],yaw_body));
+
 	q_sp.copyTo(_att_sp.q_d);
-
 	_att_sp.reset_integral = false;
 	_att_sp.timestamp = hrt_absolute_time();
+	_attitude_sp_pub.publish(_att_sp); */
 
-	// Publish the attitude setpoint
-	_attitude_sp_pub.publish(_att_sp);
 
-	// Publish the visual location
-	_visual_location.timestamp = hrt_absolute_time();
-	_visual_location.x_err = x_err_center;
-	_visual_location.y_err = y_err_center;
-	_visual_location.roll_sp = roll_setpoint;
-	_visual_location.pitch_sp = pitch_setpoint;
-	_visual_location_pub.publish(_visual_location);
 }
 
 
@@ -298,10 +418,6 @@ void FixedwingAttitudeControl::Run()
 		const matrix::Eulerf euler_angles(_R);
 
 		vehicle_manual_poll(euler_angles.psi());
-		if(_param_fw_vis_nav_en.get()==1){
-			vision_based_nav(euler_angles.psi(),dt);
-		}
-
 
 		vehicle_attitude_setpoint_poll();
 

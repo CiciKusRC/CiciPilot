@@ -288,7 +288,6 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM:
 		handle_message_open_drone_id_system(msg);
 		break;
-
 	case MAVLINK_MSG_ID_TARGET_LOCATION_XY://Görüntü işlemeden gelen mesaj
 		handle_message_target_location(msg);
 		break;
@@ -301,6 +300,10 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_MULTIVEHICLE_LOCATION:
 		handle_message_multivehicle_location(msg);
 		break;
+	case MAVLINK_MSG_ID_INTERCEPTOR_PARAMETER:
+		handle_message_interceptor_parameter(msg);
+		break;
+
 
 #if !defined(CONSTRAINED_FLASH)
 
@@ -2874,14 +2877,15 @@ MavlinkReceiver::handle_message_debug_vect(mavlink_message_t *msg)
 void
 MavlinkReceiver::handle_message_target_location(mavlink_message_t *msg) //Kameradan gelen xy ve tracker bilgisi
 {
+	//PX4_INFO("TARGET LOCATION HANDLER CALLED");
 	mavlink_target_location_xy_t target_location_msg;
 	mavlink_msg_target_location_xy_decode(msg, &target_location_msg);
 
 	target_location_s target_location_topic{};
-
 	target_location_topic.timestamp = hrt_absolute_time();
-	target_location_topic.target_x = target_location_msg.target_x;
-	target_location_topic.target_y = target_location_msg.target_y;
+	target_location_topic.target_x = target_location_msg.target_x/10e2f; // cm to m
+	target_location_topic.target_y = target_location_msg.target_y/10e2f; // cm to m
+	target_location_topic.target_z = target_location_msg.target_z/10e2f; // cm to m
 	target_location_topic.tracker_status = target_location_msg.tracker_status;
 	_target_location_pub.publish(target_location_topic);
 }
@@ -2950,6 +2954,29 @@ MavlinkReceiver::handle_message_multivehicle_location(mavlink_message_t *msg) //
 
 	_multivehicle_location_pub.publish(multivehicle_location_topic);
 }
+
+void
+MavlinkReceiver::handle_message_interceptor_parameter(mavlink_message_t *msg)
+{
+	mavlink_interceptor_parameter_t interceptor_param_msg;
+	mavlink_msg_interceptor_parameter_decode(msg, &interceptor_param_msg);
+
+	interceptor_params_s interceptor_param_topic{};
+
+	interceptor_param_topic.timestamp = hrt_absolute_time();
+	interceptor_param_topic.dead_zone = interceptor_param_msg.dead_zone;
+	interceptor_param_topic.slow_zone = interceptor_param_msg.slow_zone;
+	interceptor_param_topic.roll_p = interceptor_param_msg.roll_p;
+	interceptor_param_topic.roll_i = interceptor_param_msg.roll_i;
+	interceptor_param_topic.pitch_p = interceptor_param_msg.pitch_p;
+	interceptor_param_topic.pitch_i = interceptor_param_msg.pitch_i;
+	interceptor_param_topic.output_limit = interceptor_param_msg.output_limit;
+	interceptor_param_topic.integrator_limit = interceptor_param_msg.integrator_limit;
+	interceptor_param_topic.alpha_filter = interceptor_param_msg.alpha_filter;
+
+	_interceptor_parameter_pub.publish(interceptor_param_topic);
+}
+
 
 void
 MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)

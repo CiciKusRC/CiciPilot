@@ -731,12 +731,6 @@ FixedwingPositionControl::set_control_mode_current(const hrt_abstime &now)
 	}
 
 	else if(_control_mode.flag_control_intercept_enable){
-		if (_param_fw_vis_nav_en.get())
-		{
-			PX4_INFO("PARAMETER: %d", _param_fw_vis_nav_en.get());
-			_control_mode_current = FW_POSCTRL_MODE_OTHER;
-		}
-
 		_control_mode_current = FW_POSCTRL_MODE_AUTO_GEO_INTERCEPT;
 	}
 	else if(_control_mode.flag_control_swarm_enable){
@@ -1412,44 +1406,101 @@ FixedwingPositionControl::control_auto_position(const float control_interval, co
 				   is_low_height);
 
 	const float pitch_body = get_tecs_pitch();
+
 	const Quatf attitude_setpoint(Eulerf(roll_body, pitch_body, yaw_body));
 	attitude_setpoint.copyTo(_att_sp.q_d);
 }
 
-
 void
-FixedwingPositionControl::control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos,
-		const Vector2f &ground_speed, const position_setpoint_s &pos_sp_curr)
-{
+FixedwingPositionControl::control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos, const Vector2f &ground_speed,
+				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr, const position_setpoint_s &pos_sp_next){
 
-	if (_target_location_lla_sub.updated()) {
-		// Check if target_location_lla message is updated
-		if (_target_location_lla_sub.copy(&target_location_lla_msg)) {
-		}
+	if (_target_location_sub.update(&_target_location)) {
+		// Use target_location as needed for geo intercept logic
+		// Example: PX4_INFO("Received target location: lat=%f, lon=%f, alt=%f", target_location.lat, target_location.lon, target_location.alt);
+		tracker_status = _target_location.tracker_status;
+	}
+	if(!tracker_status){
+		control_auto(control_interval, curr_pos, ground_speed, pos_sp_prev, pos_sp_curr, pos_sp_next);
+
+	}
+	else
+	{
+		control_manual_position(control_interval, curr_pos, ground_speed);
 	}
 
 
 
-	float tecs_fw_thr_min = _param_fw_thr_min.get();
-	float tecs_fw_thr_max = _param_fw_thr_max.get();
+	/* PX4_INFO("control_auto_geo_intercept");
+	const float acc_rad = _npfg.switchDistance(500.0f);
+	float tecs_fw_thr_min;
+	float tecs_fw_thr_max;
 
+	if (pos_sp_curr.gliding_enabled) {
+		//enable gliding with this waypoint
+		_tecs.set_speed_weight(2.0f);
+		tecs_fw_thr_min = 0.0;
+		tecs_fw_thr_max = 0.0;
 
+	} else {
+		tecs_fw_thr_min = _param_fw_thr_min.get();
+		tecs_fw_thr_max = _param_fw_thr_max.get();
+	}
 
-	float position_sp_alt = target_location_lla_msg.target_alt;//float(_local_pos.ref_alt) + 50.0f;//
+	// waypoint is a plain navigation waypoint
+	float position_sp_alt = pos_sp_curr.alt;
 
-	Vector2f curr_pos_local{_local_pos.x, _local_pos.y};
-	Vector2f curr_wp_local = _global_local_proj_ref.project(target_location_lla_msg.target_lat,
-			target_location_lla_msg.target_lon);
+	// Altitude first order hold (FOH)
+	if (_position_setpoint_previous_valid &&
+	    ((pos_sp_prev.type == position_setpoint_s::SETPOINT_TYPE_POSITION) ||
+	     (pos_sp_prev.type == position_setpoint_s::SETPOINT_TYPE_LOITER))
+	   ) {
+		const float d_curr_prev = get_distance_to_next_waypoint(pos_sp_curr.lat, pos_sp_curr.lon, pos_sp_prev.lat,
+					  pos_sp_prev.lon);
 
+		// Do not try to find a solution if the last waypoint is inside the acceptance radius of the current one
+		if (d_curr_prev > math::max(acc_rad, fabsf(pos_sp_curr.loiter_radius))) {
+			// Calculate distance to current waypoint
+			const float d_curr = get_distance_to_next_waypoint(pos_sp_curr.lat, pos_sp_curr.lon, _current_latitude,
+					     _current_longitude);
 
+			// Save distance to waypoint if it is the smallest ever achieved, however make sure that
+			// _min_current_sp_distance_xy is never larger than the distance between the current and the previous wp
+			_min_current_sp_distance_xy = math::min(d_curr, _min_current_sp_distance_xy, d_curr_prev);
+
+			// if the minimal distance is smaller than the acceptance radius, we should be at waypoint alt
+			// navigator will soon switch to the next waypoint item (if there is one) as soon as we reach this altitude
+			if (_min_current_sp_distance_xy > math::max(acc_rad, fabsf(pos_sp_curr.loiter_radius))) {
+				// The setpoint is set linearly and such that the system reaches the current altitude at the acceptance
+				// radius around the current waypoint
+				const float delta_alt = (pos_sp_curr.alt - pos_sp_prev.alt);
+				const float grad = -delta_alt / (d_curr_prev - math::max(acc_rad, fabsf(pos_sp_curr.loiter_radius)));
+				const float a = pos_sp_prev.alt - grad * d_curr_prev;
+
+				position_sp_alt = a + grad * _min_current_sp_distance_xy;
+				PX4_INFO("position_sp_alt:%f",position_sp_alt);
+			}
+		}
+	}
 
 	float target_airspeed = adapt_airspeed_setpoint(control_interval, pos_sp_curr.cruising_speed,
 				_performance_model.getMinimumCalibratedAirspeed(getLoadFactor()), ground_speed);
 
+	Vector2f curr_pos_local{_local_pos.x, _local_pos.y};
+	Vector2f curr_wp_local = _global_local_proj_ref.project(pos_sp_curr.lat, pos_sp_curr.lon);
+
 	_npfg.setAirspeedNom(target_airspeed * _eas2tas);
 	_npfg.setAirspeedMax(_performance_model.getMaximumCalibratedAirspeed() * _eas2tas);
 
-	navigateWaypoint(curr_wp_local, curr_pos_local, ground_speed, _wind_vel);
+	if (_position_setpoint_previous_valid && pos_sp_prev.type != position_setpoint_s::SETPOINT_TYPE_TAKEOFF) {
+		Vector2f prev_wp_local = _global_local_proj_ref.project(pos_sp_prev.lat, pos_sp_prev.lon);
+		navigateWaypoints(prev_wp_local, curr_wp_local, curr_pos_local, ground_speed, _wind_vel);
+
+	} else {
+		PX4_INFO("geo_intercept navigateWaypoint");
+		navigateWaypoint(curr_wp_local, curr_pos_local, ground_speed, _wind_vel);
+	}
+
 	float roll_body = getCorrectedNpfgRollSetpoint();
 	target_airspeed = _npfg.getAirspeedRef() / _eas2tas;
 
@@ -1470,7 +1521,7 @@ FixedwingPositionControl::control_auto_geo_intercept(const float control_interva
 
 	const float pitch_body = get_tecs_pitch();
 	const Quatf attitude_setpoint(Eulerf(roll_body, pitch_body, yaw_body));
-	attitude_setpoint.copyTo(_att_sp.q_d);
+	attitude_setpoint.copyTo(_att_sp.q_d); */
 }
 
 void
@@ -2560,7 +2611,17 @@ FixedwingPositionControl::control_manual_position(const float control_interval, 
 
 	float calibrated_airspeed_sp = adapt_airspeed_setpoint(control_interval, get_manual_airspeed_setpoint(),
 				       _performance_model.getMinimumCalibratedAirspeed(getLoadFactor()), ground_speed, !_completed_manual_takeoff);
-	const float height_rate_sp = getManualHeightRateSetpoint();
+
+	float height_rate_sp = 0.0f;
+	if (tracker_status == true) {
+		if (PX4_ISFINITE(vis_target_y)) {
+			// Map vis_target_y from [-0.7, 0.7] rad to [-1, 1]
+			float mapped_pitch = constrain(vis_target_y / 0.7f, -1.0f, 1.0f);
+			height_rate_sp = mapped_pitch * _param_climbrate_target.get();
+		}
+	} else {
+		height_rate_sp = getManualHeightRateSetpoint();
+	}
 
 	// TECS may try to pitch down to gain airspeed if we underspeed, constrain the pitch when underspeeding if we are
 	// just passed launch
@@ -2648,12 +2709,20 @@ FixedwingPositionControl::control_manual_position(const float control_interval, 
 				   disable_underspeed_handling,
 				   height_rate_sp);
 
+/* 	if (_param_fw_vis_nav_en.get() == 1) {
+		// Map vis_target_x from [-0.85, 0.85] to [-1, 1]
+		float mapped_roll = constrain(vis_target_x / 0.85f, -1.0f, 1.0f);
+		_manual_control_setpoint.roll = mapped_roll;
+		roll_body = _manual_control_setpoint.roll * radians(_param_fw_r_lim.get());
+
+	} */
+
+
 	if (!_yaw_lock_engaged || fabsf(_manual_control_setpoint.roll) >= HDG_HOLD_MAN_INPUT_THRESH ||
 	    fabsf(_manual_control_setpoint.yaw) >= HDG_HOLD_MAN_INPUT_THRESH) {
 
 		_hdg_hold_enabled = false;
 		_yaw_lock_engaged = false;
-
 		roll_body = _manual_control_setpoint.roll * radians(_param_fw_r_lim.get());
 		yaw_body = _yaw; // yaw is not controlled, so set setpoint to current yaw
 	}
@@ -2662,7 +2731,7 @@ FixedwingPositionControl::control_manual_position(const float control_interval, 
 
 	pitch_body = get_tecs_pitch();
 
-	Quatf attitude_setpoint(Eulerf(roll_body, pitch_body, yaw_body));
+	Quatf attitude_setpoint(Eulerf(vis_target_x, pitch_body, yaw_body));
 	attitude_setpoint.copyTo(_att_sp.q_d);
 }
 
@@ -2936,6 +3005,13 @@ FixedwingPositionControl::Run()
 			}
 		}
 
+		// Visual location topic subscribers
+		if (_target_location_sub.update(&_target_location)) {
+			vis_target_x = _target_location.target_x;
+			vis_target_y = _target_location.target_y;
+			tracker_status = _target_location.tracker_status;
+		}
+
 		Vector2d curr_pos(_current_latitude, _current_longitude);
 		Vector2f ground_speed(_local_pos.vx, _local_pos.vy);
 
@@ -2997,7 +3073,7 @@ FixedwingPositionControl::Run()
 			}
 
 		case FW_POSCTRL_MODE_AUTO_GEO_INTERCEPT: {
-				control_auto_geo_intercept(control_interval, curr_pos, ground_speed, _pos_sp_triplet.current);
+				control_auto_geo_intercept(control_interval, curr_pos, ground_speed, _pos_sp_triplet.previous, _pos_sp_triplet.current, _pos_sp_triplet.next);
 				break;
 			}
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'interceptModel'.
 //
-// Model version                  : 1.41
+// Model version                  : 1.95
 // Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
-// C/C++ source code generated on : Sun Jul 20 21:25:48 2025
+// C/C++ source code generated on : Wed Aug  6 21:21:32 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -21,32 +21,32 @@
 // Block parameters (default storage)
 P_interceptModel_T interceptModel_P = {
   // Mask Parameter: Discrete_Integrator_Reset_reset
-  //  Referenced by: '<S9>/Constant2'
+  //  Referenced by: '<S13>/Constant2'
 
   1.0,
 
   // Mask Parameter: Discrete_Integrator_Reset_res_f
-  //  Referenced by: '<S13>/Constant2'
+  //  Referenced by: '<S9>/Constant2'
 
   1.0,
 
   // Mask Parameter: DirectionCosineMatrixtoRotation
   //  Referenced by:
-  //    '<S48>/Constant'
-  //    '<S50>/Constant'
+  //    '<S52>/Constant'
+  //    '<S54>/Constant'
 
   4.4408920985006262E-16,
 
   // Mask Parameter: DirectionCosineMatrixtoRotati_c
   //  Referenced by:
-  //    '<S27>/Constant'
-  //    '<S37>/Constant'
-  //    '<S39>/Constant'
+  //    '<S31>/Constant'
+  //    '<S41>/Constant'
+  //    '<S43>/Constant'
 
   1U,
 
   // Computed Parameter: Out1_Y0
-  //  Referenced by: '<S65>/Out1'
+  //  Referenced by: '<S69>/Out1'
 
   {
     (0ULL),                            // timestamp
@@ -111,7 +111,7 @@ P_interceptModel_T interceptModel_P = {
   },
 
   // Computed Parameter: Constant_Value
-  //  Referenced by: '<S19>/Constant'
+  //  Referenced by: '<S23>/Constant'
 
   {
     (0ULL),                            // timestamp
@@ -176,7 +176,7 @@ P_interceptModel_T interceptModel_P = {
   },
 
   // Computed Parameter: Out1_Y0_p
-  //  Referenced by: '<S64>/Out1'
+  //  Referenced by: '<S68>/Out1'
 
   {
     (0ULL),                            // timestamp
@@ -197,7 +197,7 @@ P_interceptModel_T interceptModel_P = {
   },
 
   // Computed Parameter: Constant_Value_h
-  //  Referenced by: '<S18>/Constant'
+  //  Referenced by: '<S22>/Constant'
 
   {
     (0ULL),                            // timestamp
@@ -218,7 +218,7 @@ P_interceptModel_T interceptModel_P = {
   },
 
   // Computed Parameter: Out1_Y0_l
-  //  Referenced by: '<S21>/Out1'
+  //  Referenced by: '<S25>/Out1'
 
   {
     (0ULL),                            // timestamp
@@ -239,7 +239,7 @@ P_interceptModel_T interceptModel_P = {
   },
 
   // Computed Parameter: Constant_Value_hp
-  //  Referenced by: '<S16>/Constant'
+  //  Referenced by: '<S19>/Constant'
 
   {
     (0ULL),                            // timestamp
@@ -259,31 +259,58 @@ P_interceptModel_T interceptModel_P = {
     // _padding0
   },
 
+  // Computed Parameter: Constant_Value_k
+  //  Referenced by: '<S17>/Constant'
+
+  {
+    (0ULL),                            // timestamp
+    0.0,                               // double_a
+    0.0,                               // double_b
+    0.0F,                              // single_a
+    0.0F                               // single_b
+  },
+
+  // Computed Parameter: Constant_Value_i
+  //  Referenced by: '<S14>/Constant'
+
+  {
+    (0ULL),                            // timestamp
+    0.0F,                              // x_sat_flag_bit
+    0.0F,                              // x_integral_effort
+    0.0F,                              // proportional_effort
+
+    {
+      0U, 0U, 0U, 0U }
+    // _padding0
+  },
+
   // Computed Parameter: Out1_Y0_n
-  //  Referenced by: '<S20>/Out1'
+  //  Referenced by: '<S24>/Out1'
 
   {
     (0ULL),                            // timestamp
     0.0F,                              // target_x
     0.0F,                              // target_y
+    0.0F,                              // target_z
     false,                             // tracker_status
 
     {
-      0U, 0U, 0U, 0U, 0U, 0U, 0U }
+      0U, 0U, 0U }
     // _padding0
   },
 
   // Computed Parameter: Constant_Value_f
-  //  Referenced by: '<S15>/Constant'
+  //  Referenced by: '<S18>/Constant'
 
   {
     (0ULL),                            // timestamp
     0.0F,                              // target_x
     0.0F,                              // target_y
+    0.0F,                              // target_z
     false,                             // tracker_status
 
     {
-      0U, 0U, 0U, 0U, 0U, 0U, 0U }
+      0U, 0U, 0U }
     // _padding0
   },
 
@@ -302,7 +329,17 @@ P_interceptModel_T interceptModel_P = {
   1.0,
 
   // Expression: 1
-  //  Referenced by: '<S14>/Constant2'
+  //  Referenced by: '<S16>/Constant2'
+
+  1.0,
+
+  // Expression: 1
+  //  Referenced by: '<S37>/Constant'
+
+  1.0,
+
+  // Expression: 1
+  //  Referenced by: '<S38>/Constant'
 
   1.0,
 
@@ -316,38 +353,43 @@ P_interceptModel_T interceptModel_P = {
 
   1.0,
 
-  // Expression: 1
-  //  Referenced by: '<S29>/Constant'
-
-  1.0,
-
-  // Expression: 1
-  //  Referenced by: '<S30>/Constant'
-
-  1.0,
-
   // Expression: 0
-  //  Referenced by: '<S39>/Constant1'
+  //  Referenced by: '<S43>/Constant1'
 
   0.0,
 
   // Expression: 0
-  //  Referenced by: '<S37>/Constant1'
+  //  Referenced by: '<S41>/Constant1'
 
   0.0,
 
   // Expression: -eye(3)
-  //  Referenced by: '<S40>/Bias1'
+  //  Referenced by: '<S44>/Bias1'
 
   { -1.0, -0.0, -0.0, -0.0, -1.0, -0.0, -0.0, -0.0, -1.0 },
 
   // Expression: -1
-  //  Referenced by: '<S41>/Bias'
+  //  Referenced by: '<S45>/Bias'
 
   -1.0,
 
   // Expression: 2
-  //  Referenced by: '<S54>/Gain'
+  //  Referenced by: '<S58>/Gain'
+
+  2.0,
+
+  // Expression: 2
+  //  Referenced by: '<S61>/Gain'
+
+  2.0,
+
+  // Expression: 2
+  //  Referenced by: '<S56>/Gain'
+
+  2.0,
+
+  // Expression: 2
+  //  Referenced by: '<S62>/Gain'
 
   2.0,
 
@@ -357,84 +399,34 @@ P_interceptModel_T interceptModel_P = {
   2.0,
 
   // Expression: 2
-  //  Referenced by: '<S52>/Gain'
-
-  2.0,
-
-  // Expression: 2
-  //  Referenced by: '<S58>/Gain'
-
-  2.0,
-
-  // Expression: 2
-  //  Referenced by: '<S53>/Gain'
-
-  2.0,
-
-  // Expression: 2
-  //  Referenced by: '<S56>/Gain'
+  //  Referenced by: '<S60>/Gain'
 
   2.0,
 
   // Expression: [1 1 -1]
-  //  Referenced by: '<S26>/Gain1'
+  //  Referenced by: '<S30>/Gain1'
 
   { 1.0, 1.0, -1.0 },
 
   // Expression: [1 1]
-  //  Referenced by: '<S26>/Gain2'
+  //  Referenced by: '<S30>/Gain2'
 
   { 1.0, 1.0 },
 
   // Expression: [-1 1]
-  //  Referenced by: '<S26>/Gain3'
+  //  Referenced by: '<S30>/Gain3'
 
   { -1.0, 1.0 },
 
-  // Expression: 0
-  //  Referenced by: '<S4>/Constant'
-
-  0.0,
-
-  // Expression: 100
-  //  Referenced by: '<S4>/Saturation'
-
-  100.0,
-
-  // Expression: -100
-  //  Referenced by: '<S4>/Saturation'
-
-  -100.0,
-
-  // Expression: 0
-  //  Referenced by: '<S4>/Constant1'
-
-  0.0,
-
-  // Expression: 4
-  //  Referenced by: '<S9>/Constant3'
-
-  4.0,
-
-  // Expression: -1
-  //  Referenced by: '<S4>/Gain1'
-
-  -1.0,
-
-  // Expression: 0
+  // Expression: 320
   //  Referenced by: '<S5>/Constant'
 
+  320.0,
+
+  // Expression: 0
+  //  Referenced by: '<S6>/Constant'
+
   0.0,
-
-  // Expression: 100
-  //  Referenced by: '<S5>/Saturation'
-
-  100.0,
-
-  // Expression: -100
-  //  Referenced by: '<S5>/Saturation'
-
-  -100.0,
 
   // Expression: 0
   //  Referenced by: '<S5>/Constant1'
@@ -451,28 +443,58 @@ P_interceptModel_T interceptModel_P = {
 
   -1.0,
 
-  // Expression: -1
-  //  Referenced by: '<S14>/Constant1'
+  // Expression: 60
+  //  Referenced by: '<S5>/Saturation1'
 
-  -1.0,
+  60.0,
 
-  // Expression: -1
-  //  Referenced by: '<S5>/Gain'
+  // Expression: -60
+  //  Referenced by: '<S5>/Saturation1'
 
-  -1.0,
+  -60.0,
+
+  // Expression: 210
+  //  Referenced by: '<S4>/Constant'
+
+  210.0,
 
   // Expression: 0
-  //  Referenced by: '<S14>/Constant3'
+  //  Referenced by: '<S4>/Constant1'
 
   0.0,
 
-  // Expression: 0.01
-  //  Referenced by: '<S13>/Constant'
+  // Expression: 4
+  //  Referenced by: '<S9>/Constant3'
 
-  0.01,
+  4.0,
+
+  // Expression: -1
+  //  Referenced by: '<S4>/Gain1'
+
+  -1.0,
+
+  // Expression: 45
+  //  Referenced by: '<S4>/Saturation1'
+
+  45.0,
+
+  // Expression: -45
+  //  Referenced by: '<S4>/Saturation1'
+
+  -45.0,
+
+  // Expression: 30
+  //  Referenced by: '<S4>/Rate Limiter'
+
+  30.0,
+
+  // Expression: -30
+  //  Referenced by: '<S4>/Rate Limiter'
+
+  -30.0,
 
   // Expression: 0
-  //  Referenced by: '<S10>/Constant3'
+  //  Referenced by: '<S4>/Rate Limiter'
 
   0.0,
 
@@ -486,8 +508,33 @@ P_interceptModel_T interceptModel_P = {
 
   -1.0,
 
+  // Expression: 0
+  //  Referenced by: '<S10>/Constant3'
+
+  0.0,
+
   // Expression: 0.01
   //  Referenced by: '<S9>/Constant'
+
+  0.01,
+
+  // Expression: -1
+  //  Referenced by: '<S16>/Constant1'
+
+  -1.0,
+
+  // Expression: -1
+  //  Referenced by: '<S5>/Gain'
+
+  -1.0,
+
+  // Expression: 0
+  //  Referenced by: '<S16>/Constant3'
+
+  0.0,
+
+  // Expression: 0.01
+  //  Referenced by: '<S13>/Constant'
 
   0.01,
 
@@ -496,12 +543,32 @@ P_interceptModel_T interceptModel_P = {
 
   0.0F,
 
-  // Computed Parameter: RateTransition_4_InitialConditi
+  // Computed Parameter: RateTransition_5_InitialConditi
   //  Referenced by: '<Root>/Rate Transition'
 
   0.0F,
 
-  // Computed Parameter: RateTransition_5_InitialConditi
+  // Computed Parameter: RateTransition_6_InitialConditi
+  //  Referenced by: '<Root>/Rate Transition'
+
+  0.0F,
+
+  // Computed Parameter: RateTransition_9_InitialConditi
+  //  Referenced by: '<Root>/Rate Transition'
+
+  0.0F,
+
+  // Computed Parameter: RateTransition_10_InitialCondit
+  //  Referenced by: '<Root>/Rate Transition'
+
+  0.0F,
+
+  // Computed Parameter: RateTransition_8_InitialConditi
+  //  Referenced by: '<Root>/Rate Transition'
+
+  0.0F,
+
+  // Computed Parameter: RateTransition_7_InitialConditi
   //  Referenced by: '<Root>/Rate Transition'
 
   0.0F,
@@ -517,32 +584,32 @@ P_interceptModel_T interceptModel_P = {
   0.0F,
 
   // Computed Parameter: Assertion_Enabled
-  //  Referenced by: '<S47>/Assertion'
+  //  Referenced by: '<S51>/Assertion'
 
   true,
 
   // Computed Parameter: Assertion_Enabled_a
-  //  Referenced by: '<S45>/Assertion'
+  //  Referenced by: '<S49>/Assertion'
 
   true,
 
   // Computed Parameter: Assertion_Enabled_g
-  //  Referenced by: '<S44>/Assertion'
+  //  Referenced by: '<S48>/Assertion'
 
   true,
 
   // Computed Parameter: Assertion_Enabled_f
-  //  Referenced by: '<S42>/Assertion'
+  //  Referenced by: '<S46>/Assertion'
 
   true,
 
   // Expression: false
-  //  Referenced by: '<S9>/Constant4'
+  //  Referenced by: '<S13>/Constant4'
 
   false,
 
   // Expression: false
-  //  Referenced by: '<S13>/Constant4'
+  //  Referenced by: '<S9>/Constant4'
 
   false
 };

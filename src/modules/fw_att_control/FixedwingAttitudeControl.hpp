@@ -68,14 +68,19 @@
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/target_location.h>
 #include <uORB/topics/visual_location.h>
+#include <uORB/topics/intercept_roll_pitch.h>
+
 using matrix::Eulerf;
 using matrix::Quatf;
 
 using uORB::SubscriptionData;
 
 using namespace time_literals;
-#define CENTER_X 640
-#define CENTER_Y 360
+#define FOCAL_LENGTH 2.75f // mm
+#define SENSOR_WIDTH 6.45f // mm
+#define SENSOR_HEIGHT 3.63f // mm
+#define RESOLUTION_WIDTH 1536
+#define RESOLUTION_HEIGHT 864
 class FixedwingAttitudeControl final : public ModuleBase<FixedwingAttitudeControl>, public ModuleParams,
 	public px4::ScheduledWorkItem
 {
@@ -96,11 +101,17 @@ public:
 
 private:
 	void Run() override;
-
+	float roll_pitch_ref[2];
+	float x_cam{0.f};
+	float y_cam{0.f};
+	float z_cam{0.f};
 	float target_x{0.f};
 	float target_y{0.f};
+	float target_roll{0.f};
+	float target_pitch{0.f};
 	float x_err_center{0.f};
 	float y_err_center{0.f};
+	float norm{0.f};
 	hrt_abstime _last_time_att_control_called{0};
 	uORB::SubscriptionCallbackWorkItem _att_sub{this, ORB_ID(vehicle_attitude)};		/**< vehicle attitude */
 
@@ -115,6 +126,7 @@ private:
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};				/**< vehicle status subscription */
 	uORB::Subscription _vehicle_rates_sub{ORB_ID(vehicle_angular_velocity)};
 	uORB::Subscription _target_location_sub{ORB_ID(target_location)};			/**< target location subscription */
+	uORB::Subscription _intercept_roll_pitch_sub{ORB_ID(intercept_roll_pitch)};		/**< intercept roll pitch subscription */
 	uORB::SubscriptionData<airspeed_validated_s> _airspeed_validated_sub{ORB_ID(airspeed_validated)};
 
 	uORB::Publication<vehicle_attitude_setpoint_s>	_attitude_sp_pub;
@@ -130,6 +142,7 @@ private:
 	landing_gear_wheel_s			_landing_gear_wheel{};
 	target_location_s			_target_location{};
 	visual_location_s			_visual_location{};
+	intercept_roll_pitch_s			_intercept_roll_pitch{};
 	matrix::Dcmf _R{matrix::eye<float, 3>()};
 
 	perf_counter_t _loop_perf;
@@ -169,7 +182,17 @@ private:
 		(ParamFloat<px4::params::FW_WR_P>) _param_fw_wr_p,
 
 		(ParamFloat<px4::params::FW_Y_RMAX>) _param_fw_y_rmax,
-		(ParamFloat<px4::params::FW_MAN_YR_MAX>) _param_man_yr_max
+		(ParamFloat<px4::params::FW_MAN_YR_MAX>) _param_man_yr_max,
+		(ParamFloat<px4::params::X_ERROR_KP>) _param_x_error_kp,
+		(ParamFloat<px4::params::X_ERROR_KI>) _param_x_error_ki,
+		(ParamFloat<px4::params::X_INT_LIM>) _param_x_int_lim,
+		(ParamBool<px4::params::INT_RESET_X>) _param_int_reset_x,
+		(ParamFloat<px4::params::ROLL_LIM_X>) _param_roll_lim_x,
+		(ParamFloat<px4::params::Y_ERROR_KP>) _param_y_error_kp,
+		(ParamFloat<px4::params::Y_ERROR_KI>) _param_y_error_ki,
+		(ParamFloat<px4::params::Y_INT_LIM>) _param_y_int_lim,
+		(ParamBool<px4::params::INT_RESET_Y>) _param_int_reset_y,
+		(ParamFloat<px4::params::ROLL_LIM_Y>) _param_roll_lim_y
 
 	)
 	static constexpr float MIN_AUTO_TIMESTEP = 0.01f;
@@ -183,7 +206,8 @@ private:
 	SlewRate<float> _pitch_vis_slew_rate;
 	void parameters_update();
 	void vehicle_manual_poll(const float yaw_body);
-	void vision_based_nav(const float yaw_body,const float control_interval);
+	void vision_based_nav(const float yaw_body,const float control_interval,const float current_roll, const float current_pitch);
+	void computeDirectionVector(const float dt, const float target_x, const float target_y,const float current_roll, const float current_pitch);
 	void vehicle_attitude_setpoint_poll();
 	void vehicle_land_detected_poll();
 	float get_airspeed_constrained();

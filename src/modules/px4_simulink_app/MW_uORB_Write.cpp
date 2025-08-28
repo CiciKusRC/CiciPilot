@@ -10,10 +10,11 @@ void uORB_write_initialize(orb_metadata_t* orbData,
                           orb_advert_t* orbAdvertObj,
                           void* busData,
                           int queueLen) {
-    *orbAdvertObj = orb_advertise_queue(orbData, busData, queueLen);    
+int instance = 0;
+*orbAdvertObj = orb_advertise(orbData,nullptr);
 #if DEBUG
     PX4_INFO("Started advertising topic: %s \n",  orbData->o_name);
-#endif    
+#endif
 }
 
 void uORB_write_step(orb_metadata_t* orbData,

@@ -100,6 +100,8 @@
 #include <uORB/uORB.h>
 #include <uORB/topics/kamikaze_pronav_status.h>
 #include <uORB/topics/target_location_lla.h>
+#include <uORB/topics/visual_location.h>
+#include <uORB/topics/target_location.h>
 
 #ifdef CONFIG_FIGURE_OF_EIGHT
 #include "figure_eight/FigureEight.hpp"
@@ -222,6 +224,8 @@ private:
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
 	uORB::Subscription _target_location_lla_sub{ORB_ID(target_location_lla)};
+	uORB::Subscription _visual_location_sub{ORB_ID(visual_location)};
+	uORB::Subscription _target_location_sub{ORB_ID(target_location)};
 
 	uORB::Publication<vehicle_attitude_setpoint_s> _attitude_sp_pub;
 	uORB::Publication<vehicle_local_position_setpoint_s> _local_pos_sp_pub{ORB_ID(vehicle_local_position_setpoint)};
@@ -247,6 +251,8 @@ private:
 	vehicle_status_s _vehicle_status{};
 	kamikaze_pronav_status_s kamikaze_pronav_status{};
 	target_location_lla_s target_location_lla_msg{};
+	visual_location_s _visual_location{};
+	target_location_s _target_location{};
 	Vector2f _lpos_where_backtrans_started;
 
 	bool _position_setpoint_previous_valid{false};
@@ -344,6 +350,11 @@ private:
 
 	float _body_acceleration_x{0.f};
 	float _body_velocity_x{0.f};
+
+	float vis_target_x{0.f};
+	float vis_target_y{0.f};
+
+	bool tracker_status{false};
 
 	MapProjection _global_local_proj_ref{};
 
@@ -704,19 +715,17 @@ private:
 				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr);
 
 
-
-
 	/**
 	 * @brief Vehicle control for heading hold waypoints.
 	 *
 	 * @param control_interval Time since last position control call [s]
 	 * @param curr_pos Current 2D local position vector of vehicle [m]
 	 * @param ground_speed Local 2D ground speed of vehicle [m/s]
+	 * @param pos_sp_prev previous position setpoint
 	 * @param pos_sp_curr current position setpoint
 	 */
-	void control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos,
-		const Vector2f &ground_speed, const position_setpoint_s &pos_sp_curr);
-
+	void control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos, const Vector2f &ground_speed,
+				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr, const position_setpoint_s &pos_sp_next);
 	/**
 	 *
 	 * control auto kamikaze diving phase
@@ -1113,6 +1122,7 @@ private:
 		(ParamFloat<px4::params::FW_T_THR_LOW_HGT>) _param_fw_t_thr_low_hgt,
 		(ParamBool<px4::params::FW_LND_EARLYCFG>) _param_fw_lnd_earlycfg,
 		(ParamInt<px4::params::FW_LND_USETER>) _param_fw_lnd_useter,
+		(ParamFloat<px4::params::FW_AIRSPD_TRIM>) _param_fw_airspd_trim,
 
 		(ParamFloat<px4::params::FW_P_LIM_MAX>) _param_fw_p_lim_max,
 		(ParamFloat<px4::params::FW_P_LIM_MIN>) _param_fw_p_lim_min,

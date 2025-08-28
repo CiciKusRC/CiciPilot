@@ -114,6 +114,8 @@ set(msg_files
 	HeaterStatus.msg
 	HoverThrustEstimate.msg
 	InputRc.msg
+	InterceptDebug.msg
+	InterceptorParams.msg
 	InterceptRollPitch.msg
 	InternalCombustionEngineStatus.msg
 	IridiumsbdStatus.msg

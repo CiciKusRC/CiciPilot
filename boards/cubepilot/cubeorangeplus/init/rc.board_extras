@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# Startup customizations required for UAV Toolbox Support Package for PX4 Autopilots
+#------------------------------------------------------------------------------------
+
+# Start MAVLink stream through /dev/ttyACM0 for onboard connectivity 
+mavlink stream -r 25 -s TRAJECTORY_REPRESENTATION_WAYPOINTS -d /dev/ttyACM0
+# Start px4_simulink_app on PX4 Autopilot
+px4_simulink_app start
