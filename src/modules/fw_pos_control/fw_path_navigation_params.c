@@ -1147,6 +1147,22 @@ PARAM_DEFINE_FLOAT(SW_FOLLOW_SIDE, 0);
 
 
 /**
+ *
+ * Swarm folllow altitude offset
+ *
+ * @unit m
+ * @min -20.0
+ * @max 20.0
+ * @decimal 1
+ * @increment 0.5
+ * @group Swarm
+ *
+ */
+PARAM_DEFINE_FLOAT(SW_ALT_OFF, 0.0f);
+
+
+
+/**
  * Waiting point latitude
  * @unit deg
  * @min 0.000000

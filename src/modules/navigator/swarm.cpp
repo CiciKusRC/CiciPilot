@@ -96,7 +96,7 @@ void Swarm::calculate_wingman_position(const Vector3f &leader_position, float of
 
 	float wingman_lat = lat_rad + d_lat;
 	float wingman_lon = lon_rad + d_lon;
-	float wingman_alt = leader_position(2); // same AGL altitude
+	float wingman_alt = leader_position(2)+_param_sw_alt_off.get(); // same AGL altitude
 
 	// Convert back to degrees
 	wingman_position(0) = math::degrees(wingman_lat);

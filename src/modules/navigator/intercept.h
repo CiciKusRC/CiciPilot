@@ -47,6 +47,7 @@
 #include <uORB/topics/target_location_lla.h>
 #include <uORB/topics/vehicle_global_position.h>
 #include <uORB/topics/multi_vehicle_location.h>
+#include <uORB/topics/target_uav_location.h>
 #include <uORB/Publication.hpp>
 
 
@@ -92,5 +93,6 @@ private:
 	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};	/**< global position subscription */
 	uORB::Subscription _target_location_lla_sub{ORB_ID(target_location_lla)};	/**< target location subscription */
 	uORB::Subscription _multi_vehicle_location_sub{ORB_ID(multi_vehicle_location)};	/**< target location subscription */
+	uORB::Subscription _target_uav_location_sub{ORB_ID(target_uav_location)};
 
 };

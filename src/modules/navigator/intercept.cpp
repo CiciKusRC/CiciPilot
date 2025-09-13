@@ -52,12 +52,19 @@ void Intercept::on_active()
 		current_longitude = global_pos.lon;
 		current_altitude = global_pos.alt;
 	}
-	if(_target_location_lla_sub.updated()){
+/* 	if(_target_location_lla_sub.updated()){
 		target_location_lla_s target_location;
 		_target_location_lla_sub.copy(&target_location);
 		target_lat = target_location.target_lat;
 		target_lon = target_location.target_lon;
 		target_alt = target_location.target_alt;
+	} */
+	if(_target_uav_location_sub.updated()){
+		target_uav_location_s target_uav_location;
+		_target_uav_location_sub.copy(&target_uav_location);
+		target_lat = target_uav_location.latitude;
+		target_lon = target_uav_location.longitude;
+		target_alt = target_uav_location.altitude;
 	}
 	if(_multi_vehicle_location_sub.updated()){
 		_multi_vehicle_location_sub.copy(&_multi_vehicle_location);
@@ -74,13 +81,13 @@ void Intercept::on_active()
 	pos_sp_triplet->previous.valid = true;
 
 	// Set the current setpoint to the current position
-	pos_sp_triplet->current.lat = _multi_vehicle_location.vehicle_1_latitude / 1e7;
-	pos_sp_triplet->current.lon = _multi_vehicle_location.vehicle_1_longitude / 1e7;
-	pos_sp_triplet->current.alt = (_multi_vehicle_location.vehicle_1_altitude * 0.001f) + _navigator->get_home_position()->alt;
+	pos_sp_triplet->current.lat = target_lat/1e7;
+	pos_sp_triplet->current.lon = target_lon/1e7;
+	pos_sp_triplet->current.alt = (target_alt/1e3) + _navigator->get_home_position()->alt;
 	pos_sp_triplet->current.valid = true;
 	pos_sp_triplet->current.type = position_setpoint_s::SETPOINT_TYPE_POSITION;
 
-	double offset_distance = 50.0; // meters
+	double offset_distance = 250.0; // meters
 	double heading_rad = 0.0; // 0 degree in radians
 
 	// Earth's radius in meters

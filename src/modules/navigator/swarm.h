@@ -90,6 +90,7 @@ private:
 	DEFINE_PARAMETERS(
 		(ParamFloat<px4::params::SW_FOLLOW_OFFSET>) _param_sw_follow_offset,
 		(ParamFloat<px4::params::SW_FOLLOW_SIDE>) _param_sw_follow_side,
+		(ParamFloat<px4::params::SW_ALT_OFF>) _param_sw_alt_off,
 		(ParamFloat<px4::params::SW_WAIT_LAT>) _param_sw_wait_lat,
 		(ParamFloat<px4::params::SW_WAIT_LON>) _param_sw_wait_lon,
 		(ParamFloat<px4::params::SW_ZONE1_LAT>) _param_sw_zone1_lat,

@@ -192,7 +192,16 @@ private:
 		(ParamFloat<px4::params::Y_ERROR_KI>) _param_y_error_ki,
 		(ParamFloat<px4::params::Y_INT_LIM>) _param_y_int_lim,
 		(ParamBool<px4::params::INT_RESET_Y>) _param_int_reset_y,
-		(ParamFloat<px4::params::ROLL_LIM_Y>) _param_roll_lim_y
+		(ParamFloat<px4::params::ROLL_LIM_Y>) _param_roll_lim_y,
+		(ParamFloat<px4::params::INT_DZ>) _param_int_dz,
+		(ParamFloat<px4::params::INT_SZ>) _param_int_sz,
+		(ParamFloat<px4::params::INT_ROLL_P>) _param_int_roll_p,
+		(ParamFloat<px4::params::INT_ROLL_I>) _param_int_roll_i,
+		(ParamFloat<px4::params::INT_PITCH_P>) _param_int_pitch_p,
+		(ParamFloat<px4::params::INT_PITCH_I>) _param_int_pitch_i,
+		(ParamFloat<px4::params::INT_OUT_LIM>) _param_int_out_lim,
+		(ParamFloat<px4::params::INT_INTEGRAL_LIM>) _param_int_integral_lim,
+		(ParamFloat<px4::params::INT_ALPHA_F>) _param_int_alpha_f
 
 	)
 	static constexpr float MIN_AUTO_TIMESTEP = 0.01f;

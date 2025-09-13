@@ -1415,21 +1415,23 @@ void
 FixedwingPositionControl::control_auto_geo_intercept(const float control_interval, const Vector2d &curr_pos, const Vector2f &ground_speed,
 				   const position_setpoint_s &pos_sp_prev, const position_setpoint_s &pos_sp_curr, const position_setpoint_s &pos_sp_next){
 
-	if (_target_location_sub.update(&_target_location)) {
+/* 	if (_target_location_sub.update(&_target_location)) {
 		// Use target_location as needed for geo intercept logic
 		// Example: PX4_INFO("Received target location: lat=%f, lon=%f, alt=%f", target_location.lat, target_location.lon, target_location.alt);
 		tracker_status = _target_location.tracker_status;
-	}
-	if(!tracker_status){
+	} */
+	if(tracker_status == 0){
 		control_auto(control_interval, curr_pos, ground_speed, pos_sp_prev, pos_sp_curr, pos_sp_next);
 
 	}
-	else
+	else if((tracker_status==1) && (_param_fw_vis_nav_en.get() == 1) )
 	{
 		control_manual_position(control_interval, curr_pos, ground_speed);
 	}
-
-
+	else
+	{
+		control_auto(control_interval, curr_pos, ground_speed, pos_sp_prev, pos_sp_curr, pos_sp_next);
+	}
 
 	/* PX4_INFO("control_auto_geo_intercept");
 	const float acc_rad = _npfg.switchDistance(500.0f);
@@ -2613,8 +2615,9 @@ FixedwingPositionControl::control_manual_position(const float control_interval, 
 				       _performance_model.getMinimumCalibratedAirspeed(getLoadFactor()), ground_speed, !_completed_manual_takeoff);
 
 	float height_rate_sp = 0.0f;
-	if (tracker_status == true) {
+	if (tracker_status == 1) {
 		if (PX4_ISFINITE(vis_target_y)) {
+			PX4_INFO("Using vision height rate TRACKER STATUS = 1");
 			// Map vis_target_y from [-0.7, 0.7] rad to [-1, 1]
 			float mapped_pitch = constrain(vis_target_y / 0.7f, -1.0f, 1.0f);
 			height_rate_sp = mapped_pitch * _param_climbrate_target.get();
@@ -3006,11 +3009,22 @@ FixedwingPositionControl::Run()
 		}
 
 		// Visual location topic subscribers
-		if (_target_location_sub.update(&_target_location)) {
+
+		if(_target_location_sub.updated()){
+			_target_location_sub.copy(&_target_location);
 			vis_target_x = _target_location.target_x;
 			vis_target_y = _target_location.target_y;
 			tracker_status = _target_location.tracker_status;
+			PX4_INFO("Tracker status in run function: %d", tracker_status);
 		}
+
+
+
+/* 		if (_target_location_sub.update(&_target_location)) {
+			vis_target_x = _target_location.target_x;
+			vis_target_y = _target_location.target_y;
+			tracker_status = _target_location.tracker_status;
+		} */
 
 		Vector2d curr_pos(_current_latitude, _current_longitude);
 		Vector2f ground_speed(_local_pos.vx, _local_pos.vy);
