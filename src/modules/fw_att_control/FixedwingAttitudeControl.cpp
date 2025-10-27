@@ -119,7 +119,6 @@ FixedwingAttitudeControl::vehicle_manual_poll(const float yaw_body)
 	}
 }
 
-
 void FixedwingAttitudeControl::computeDirectionVector(float dt, float target_x, float target_y, float roll_act, float pitch_act)
 {
     // ==== YENİ: Hedefin X Eksenindeki Kayma Hızını Hesaplama ====

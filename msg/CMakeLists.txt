@@ -212,6 +212,7 @@ set(msg_files
 	SensorUwb.msg
 	SensorAirflow.msg
 	SystemPower.msg
+	TargetXyGc.msg
 	TakeoffStatus.msg
 	TargetLocation.msg
 	TargetLocationLla.msg

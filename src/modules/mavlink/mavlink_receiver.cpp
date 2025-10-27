@@ -288,21 +288,31 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM:
 		handle_message_open_drone_id_system(msg);
 		break;
+
 	case MAVLINK_MSG_ID_TARGET_LOCATION_XY://Görüntü işlemeden gelen mesaj
 		handle_message_target_location(msg);
 		break;
+
 	case MAVLINK_MSG_ID_TARGET_LOCATION_LLA:
 		handle_message_target_location_lla(msg);
 		break;
+
 	case MAVLINK_MSG_ID_TARGET_UAV_LOCATION://Siyi gimbalden gelen mesaj
 		handle_message_target_uav_location(msg);
 		break;
+
 	case MAVLINK_MSG_ID_MULTIVEHICLE_LOCATION:
 		handle_message_multivehicle_location(msg);
 		break;
+
 	case MAVLINK_MSG_ID_INTERCEPTOR_PARAMETER:
 		handle_message_interceptor_parameter(msg);
 		break;
+
+	case MAVLINK_MSG_ID_TARGET_XY_GC:
+		handle_message_target_xy_gc(msg);
+		break;
+
 
 
 #if !defined(CONSTRAINED_FLASH)
@@ -326,6 +336,7 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY:
 		handle_message_debug_float_array(msg);
 		break;
+
 #endif // !CONSTRAINED_FLASH
 
 	case MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE:
@@ -944,7 +955,6 @@ MavlinkReceiver::handle_message_hil_optical_flow(mavlink_message_t *msg)
 void
 MavlinkReceiver::handle_message_set_mode(mavlink_message_t *msg)
 {
-	PX4_INFO("Received SET_MODE HANDLE MESSAGE");
 	mavlink_set_mode_t new_mode;
 	mavlink_msg_set_mode_decode(msg, &new_mode);
 
@@ -2977,6 +2987,27 @@ MavlinkReceiver::handle_message_interceptor_parameter(mavlink_message_t *msg)
 	_interceptor_parameter_pub.publish(interceptor_param_topic);
 }
 
+void
+MavlinkReceiver::handle_message_target_xy_gc(mavlink_message_t *msg)
+{
+	mavlink_target_xy_gc_t target_xy_gc_msg;
+	mavlink_msg_target_xy_gc_decode(msg, &target_xy_gc_msg);
+
+	target_xy_gc_s target_xy_gc_topic{};
+
+	target_xy_gc_topic.timestamp = hrt_absolute_time();
+	target_xy_gc_topic.target_x0 = target_xy_gc_msg.target_x0/10e8f;
+	target_xy_gc_topic.target_y0 = target_xy_gc_msg.target_y0/10e8f;
+	target_xy_gc_topic.target_x1 = target_xy_gc_msg.target_x1/10e8f;
+	target_xy_gc_topic.target_y1 = target_xy_gc_msg.target_y1/10e8f;
+
+	_target_xy_gc_pub.publish(target_xy_gc_topic);
+	PX4_INFO("TARGET XY GC RECEIVED: x0: %.2f y0: %.2f x1: %.2f y1: %.2f",
+		(double)target_xy_gc_topic.target_x0,
+		(double)target_xy_gc_topic.target_y0,
+		(double)target_xy_gc_topic.target_x1,
+		(double)target_xy_gc_topic.target_y1);
+}
 
 void
 MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)
@@ -2997,6 +3028,8 @@ MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)
 
 	_debug_array_pub.publish(debug_topic);
 }
+
+
 #endif // !CONSTRAINED_FLASH
 
 void
