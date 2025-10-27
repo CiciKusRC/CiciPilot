@@ -3009,6 +3009,7 @@ MavlinkReceiver::handle_message_target_xy_gc(mavlink_message_t *msg)
 		(double)target_xy_gc_topic.target_y1);
 }
 
+
 void
 MavlinkReceiver::handle_message_debug_float_array(mavlink_message_t *msg)
 {
